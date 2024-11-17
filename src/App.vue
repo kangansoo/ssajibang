@@ -6,7 +6,7 @@ import FooterBar from './components/FooterBar.vue'
 <template>
   <div class="flex flex-col min-h-screen bg-white overflow-x-hidden font-sans">
     <NavigationBar />
-    <main class="flex-grow flex">
+    <main class="flex flex-grow">
       <RouterView />
     </main>
     <FooterBar />

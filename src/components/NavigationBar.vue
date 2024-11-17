@@ -18,12 +18,6 @@ import { RouterLink } from 'vue-router';
         <RouterLink to="/login" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#e46d0c] text-white text-sm font-bold leading-normal tracking-[0.015em]">
           <span class="truncate">로그인/회원가입</span>
         </RouterLink>
-        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#f5f2f0] text-[#181411] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
-          <!-- Heart icon -->
-        </button>
-        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#f5f2f0] text-[#181411] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
-          <!-- Notification icon -->
-        </button>
       </div>
       <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style="background-image: url('https://cdn.usegalileo.ai/stability/5ae466dd-d169-4bf9-8aa5-8a7b93faf52b.png');"></div>
     </div>

@@ -1,24 +1,28 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 
-var map;
+const map = ref(null);
 const positions = ref([]);
 const markers = ref([]);
 
-const props = defineProps({ stations: Array, selectStation: Object });
+const props = defineProps({ 
+  stations: Array, 
+  selectStation: Object,
+  searchQuery: String
+});
 
-watch(
-  () => props.selectStation.value,
-  () => {
-    // 이동할 위도 경도 위치를 생성합니다
-    var moveLatLon = new kakao.maps.LatLng(props.selectStation.lat, props.selectStation.lng);
+watch(() => props.selectStation, (newStation) => {
+  if (newStation && map.value) {
+    const moveLatLon = new kakao.maps.LatLng(newStation.lat, newStation.lng);
+    map.value.panTo(moveLatLon);
+  }
+}, { deep: true });
 
-    // 지도 중심을 부드럽게 이동시킵니다
-    // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
-    map.panTo(moveLatLon);
-  },
-  { deep: true }
-);
+watch(() => props.searchQuery, (newQuery) => {
+  if (newQuery && map.value) {
+    searchLocation(newQuery);
+  }
+});
 
 onMounted(() => {
   if (window.kakao && window.kakao.maps) {
@@ -28,76 +32,76 @@ onMounted(() => {
     script.src = `//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${
       import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY
     }&libraries=services,clusterer`;
-    /* global kakao */
     script.onload = () => kakao.maps.load(() => initMap());
     document.head.appendChild(script);
   }
 });
 
-watch(
-  () => props.stations.value,
-  () => {
-    positions.value = [];
-    props.stations.forEach((station) => {
-      let obj = {};
-      obj.latlng = new kakao.maps.LatLng(station.lat, station.lng);
-      obj.title = station.statNm;
-
-      positions.value.push(obj);
-    });
+watch(() => props.stations, (newStations) => {
+  if (newStations && newStations.length > 0) {
+    positions.value = newStations.map(station => ({
+      latlng: new kakao.maps.LatLng(station.lat, station.lng),
+      title: station.name
+    }));
     loadMarkers();
-  },
-  { deep: true }
-);
+  }
+}, { deep: true });
 
 const initMap = () => {
   const container = document.getElementById("map");
   const options = {
-    center: new kakao.maps.LatLng(33.450701, 126.570667),
+    center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울시청 좌표로 변경
     level: 3,
   };
-  map = new kakao.maps.Map(container, options);
-
-  // loadMarkers();
+  map.value = new kakao.maps.Map(container, options);
 };
 
 const loadMarkers = () => {
-  // 현재 표시되어있는 marker들이 있다면 map에 등록된 marker를 제거한다.
   deleteMarkers();
-
-  // 마커 이미지를 생성합니다
-  //   const imgSrc = require("@/assets/map/markerStar.png");
-  // 마커 이미지의 이미지 크기 입니다
-  //   const imgSize = new kakao.maps.Size(24, 35);
-  //   const markerImage = new kakao.maps.MarkerImage(imgSrc, imgSize);
-
-  // 마커를 생성합니다
-  markers.value = [];
-  positions.value.forEach((position) => {
+  markers.value = positions.value.map(position => {
     const marker = new kakao.maps.Marker({
-      map: map, // 마커를 표시할 지도
-      position: position.latlng, // 마커를 표시할 위치
-      title: position.title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됨.
-      clickable: true, // // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
-      // image: markerImage, // 마커의 이미지
+      map: map.value,
+      position: position.latlng,
+      title: position.title,
+      clickable: true,
     });
-    markers.value.push(marker);
+
+    // 마커 클릭 이벤트 추가
+    kakao.maps.event.addListener(marker, 'click', () => {
+      const infowindow = new kakao.maps.InfoWindow({
+        content: `<div style="padding:5px;">${position.title}</div>`
+      });
+      infowindow.open(map.value, marker);
+    });
+
+    return marker;
   });
 
-  // 4. 지도를 이동시켜주기
-  // 배열.reduce( (누적값, 현재값, 인덱스, 요소)=>{ return 결과값}, 초기값);
-  const bounds = positions.value.reduce(
-    (bounds, position) => bounds.extend(position.latlng),
-    new kakao.maps.LatLngBounds()
-  );
-
-  map.setBounds(bounds);
+  if (markers.value.length > 0) {
+    const bounds = new kakao.maps.LatLngBounds();
+    markers.value.forEach(marker => bounds.extend(marker.getPosition()));
+    map.value.setBounds(bounds);
+  }
 };
 
 const deleteMarkers = () => {
-  if (markers.value.length > 0) {
-    markers.value.forEach((marker) => marker.setMap(null));
-  }
+  markers.value.forEach(marker => marker.setMap(null));
+  markers.value = [];
+};
+
+const searchLocation = (query) => {
+  const ps = new kakao.maps.services.Places();
+  ps.keywordSearch(query, (data, status) => {
+    if (status === kakao.maps.services.Status.OK) {
+      const bounds = new kakao.maps.LatLngBounds();
+      const newPositions = data.map(item => ({
+        latlng: new kakao.maps.LatLng(item.y, item.x),
+        title: item.place_name
+      }));
+      positions.value = newPositions;
+      loadMarkers();
+    }
+  });
 };
 </script>
 
