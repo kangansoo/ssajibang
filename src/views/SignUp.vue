@@ -17,8 +17,8 @@ const passwordMismatch = computed(() => {
 });
 
 const isFormValid = computed(() => {
-  return name.value && email.value && password.value && 
-         confirmPassword.value && !passwordMismatch.value && !emailError.value && 
+  return name.value && email.value && password.value &&
+         confirmPassword.value && !passwordMismatch.value && !emailError.value &&
          isEmailChecked.value;
 });
 
@@ -33,7 +33,7 @@ const checkEmail = async () => {
     const response = await localAxios().get('/members/check-email', {
       params: { email: email.value }
     });
-    
+
     // 200 OK 응답을 받으면 이메일 사용 가능
     emailMessage.value = '사용 가능한 이메일입니다.';
     emailError.value = false;
@@ -68,7 +68,7 @@ const handleSignUp = async () => {
         password: password.value,
         name: name.value
       });
-      
+
       console.log('회원가입 성공:', response.data);
       if (response.status === 200) {
         router.push('/login');
@@ -92,7 +92,7 @@ const handleEmailChange = () => {
       <h2 class="text-[#181411] text-2xl font-bold mb-6 text-center">Sign Up</h2>
       <form @submit.prevent="handleSignUp">
         <div class="mb-4">
-          <label for="name" class="block text-[#8a7360] text-sm font-medium mb-2">Full Name</label>
+          <label for="name" class="block text-[#8a7360] text-sm font-medium mb-2">Name</label>
           <input type="text" id="name" v-model="name" required
                  class="w-full px-3 py-2 border border-[#e6e0db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#e46d0c]">
         </div>
@@ -102,7 +102,7 @@ const handleEmailChange = () => {
             <input type="email" id="email" v-model="email" required
                    @input="handleEmailChange"
                    class="flex-grow px-3 py-2 border border-[#e6e0db] rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#e46d0c]">
-            <button @click.prevent="checkEmail" 
+            <button @click.prevent="checkEmail"
                     class="bg-[#e46d0c] text-white px-4 py-2 rounded-r-md hover:bg-[#c45a0a] transition duration-300">
               Check
             </button>
@@ -124,7 +124,7 @@ const handleEmailChange = () => {
             비밀번호가 일치하지 않습니다.
           </p>
         </div>
-        <button type="submit" 
+        <button type="submit"
                 class="w-full bg-[#e46d0c] text-white py-2 px-4 rounded-md hover:bg-[#c45a0a] transition duration-300"
                 :disabled="!isFormValid"
                 :class="{'opacity-50 cursor-not-allowed': !isFormValid}">

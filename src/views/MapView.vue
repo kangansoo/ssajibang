@@ -2,6 +2,8 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import VKakaoMap from "@/components/common/VKakaoMap.vue";
+import ResultMenu from '@/components/ResultMenu.vue';
+import SearchFilter from '@/components/SearchFilter.vue';
 
 const route = useRoute();
 const searchQuery = ref('');
@@ -41,11 +43,23 @@ const performSearch = async () => {
 </script>
 
 <template>
-  <div class="container flex-grow flex text-center">
-    <VKakaoMap 
-      :stations="chargingStations" 
-      :selectStation="selectStation" 
-      :searchQuery="searchQuery" 
-    />
+  <div class="flex flex-col flex-grow">
+    <!-- 50px 높이의 공백 추가 -->
+    <div class="h-[50px] border-b border-solid border-[#f5f2f0]">
+      <SearchFilter />
+    </div>
+    <!-- 기존 콘텐츠 -->
+    <div class="flex flex-grow">
+      <div class="w-[400px] flex-shrink-0 border-r border-solid border-[#f5f2f0]">
+        <ResultMenu/>
+      </div>
+      <div class="flex-grow flex justify-end">
+        <VKakaoMap
+          :stations="chargingStations"
+          :selectStation="selectStation"
+          :searchQuery="searchQuery"
+        />
+      </div>
+    </div>
   </div>
 </template>
