@@ -1,10 +1,17 @@
 <script setup>
 import { RouterLink } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
+import MemberToggle from '@/components/MemberToggle.vue';
 
 const userStore = useUserStore();
-const { userInfo } = storeToRefs(userStore);
+const { isLogin } = storeToRefs(userStore);
+
+onMounted(() => {
+  userStore.getUserInfo();
+});
+
 </script>
 
 <template>
@@ -19,17 +26,15 @@ const { userInfo } = storeToRefs(userStore);
     </div>
     <div class="flex flex-1 justify-end gap-8">
       <div class="flex items-center gap-4">
-        <!-- 로그인한 경우 -->
-        <template v-if="userInfo">
+        <template v-if="isLogin">
           <RouterLink
             to="/write"
             class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#e46d0c] text-white text-sm font-bold leading-normal tracking-[0.015em]"
           >
             <span class="truncate">게시글 작성</span>
           </RouterLink>
-          <span class="text-[#181411] text-sm">{{ userInfo.name }}님 안녕하세요.</span>
+          <MemberToggle :is-open="isOpen" @close="closeMenu" />
         </template>
-        <!-- 로그인하지 않은 경우 -->
         <template v-else>
           <RouterLink
             to="/login"
@@ -44,4 +49,7 @@ const { userInfo } = storeToRefs(userStore);
 </template>
 
 <style scoped>
+#memberName:hover {
+  text-decoration: underline;
+}
 </style>

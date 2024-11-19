@@ -4,6 +4,8 @@ import MapView from '../views/MapView.vue'
 import LoginView from '@/views/LoginView.vue';
 import SignUp from '@/views/SignUp.vue';
 import WriteArticle from '@/views/WriteArticle.vue';
+import MyPage from '@/views/MyPage.vue';
+import ChattingView from '@/views/ChattingView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +34,17 @@ const router = createRouter({
       path: '/write',
       name: 'write',
       component: WriteArticle
+    },
+    {
+      path: '/user/:userId',
+      name: 'mypage',
+      // beforeEnter: onlyAuthUser,
+      component: MyPage
+    },
+    {
+      path: '/chat',
+      name: 'chat',
+      component: ChattingView
     },
   ],
 });
