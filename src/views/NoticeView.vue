@@ -1,37 +1,48 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import NoticeItem from '@/components/notice/NoticeItem.vue';
+import { localAxios } from '@/util/http-commons';
 
-const notices = ref([
-  {
-    id: 1,
-    title: "공지사항 제목 1",
-    date: "2024-11-20",
-    content: "공지사항 내용 1...",
-    isOpen: false
-  },
-  {
-    id: 2,
-    title: "공지사항 제목 2",
-    date: "2024-11-21",
-    content: "공지사항 내용 2...",
-    isOpen: false
-  },
-  {
-    id: 3,
-    title: "공지사항 제목 3",
-    date: "2024-11-21",
-    content: "공지사항 내용 3...",
-    isOpen: false
-  },
-]);
+const notices = ref([]);
+const currentPage = ref(0);
+const totalPage = ref(0);
+const totalNotice = ref(0);
 
-const toggleNotice = (id) => {
+const fetchNotices = async () => {
+  try {
+    const response = await localAxios().get('/notices');
+    const data = response.data;
+    notices.value = data.noticeList.map(notice => ({
+      ...notice,
+      isOpen: false,
+      date: new Date(notice.createdAt).toLocaleDateString()
+    }));
+    console.log("response: ", response);
+    currentPage.value = data.currentPage;
+    totalPage.value = data.totalPage;
+    totalNotice.value = data.totalNotice;
+  } catch (error) {
+    console.error('공지사항을 불러오는 데 실패했습니다:', error);
+  }
+};
+
+const toggleNotice = async (id) => {
   const notice = notices.value.find(n => n.id === id);
   if (notice) {
+    if (!notice.isOpen) {
+      try {
+        const response = await localAxios.get(`/notices/${id}`);
+        const detailData = response.data;
+        notice.content = detailData.content;
+      } catch (error) {
+        console.error('공지사항 상세 내용을 불러오는 데 실패했습니다:', error);
+      }
+    }
     notice.isOpen = !notice.isOpen;
   }
 };
+
+onMounted(fetchNotices);
 </script>
 
 <template>
