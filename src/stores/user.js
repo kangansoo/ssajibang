@@ -1,44 +1,32 @@
 import { jwtDecode } from 'jwt-decode';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { localAxios } from '@/util/http-commons';
 
 export const useUserStore = defineStore('user', () => {
   const isLogin = ref(false);
-  const isLoginError = ref(false);
   const userInfo = ref(null);
   const isValidToken = ref(false);
 
+  // setUserInfo 함수를 return 객체에 포함시켜야 합니다
   const setUserInfo = (info) => {
     userInfo.value = info;
     isLogin.value = true;
   };
 
-  const setLoginState = (state) => {
-    isLogin.value = state;
-  };
-
-  const setAccessToken = (token) => {
-    localStorage.setItem('accessToken', token);
-  };
-
-  const getUserInfo = async () => {
+  const initUserInfo = () => {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      const decodedToken = jwtDecode(token);
       try {
-        const response = await localAxios().get(`/user/info/${decodedToken.userId}`);
-        if (response.status === 200) {
-          setUserInfo(response.data.userInfo);
-          isValidToken.value = true;
-        } else {
-          useUserStore.logout();
-        }
+        const decodedToken = jwtDecode(token);
+        setUserInfo(decodedToken);
+        isValidToken.value = true;
+        isLogin.value = true;
       } catch (error) {
-        console.error('사용자 정보 가져오기 실패:', error);
-        isValidToken.value = false;
-        // 토큰 재발급 로직 추가 필요
+        console.error('토큰 디코딩 실패:', error);
+        logout();
       }
+    } else {
+      logout();
     }
   };
 
@@ -51,23 +39,18 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     isLogin,
-    isLoginError,
     userInfo,
     isValidToken,
+    initUserInfo,
     setUserInfo,
-    setLoginState,
-    setAccessToken,
-    getUserInfo,
-    logout
+    logout,
   };
 }, {
   persist: {
     enabled: true,
-    strategies: [
-      {
-        storage: localStorage,
-        paths: ['isLogin', 'userInfo']
-      }
-    ]
-  }
+    strategies: [{
+      storage: localStorage,
+      paths: ['isLogin'],
+    }],
+  },
 });

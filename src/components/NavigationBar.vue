@@ -8,8 +8,9 @@ import MemberToggle from '@/components/MemberToggle.vue';
 const userStore = useUserStore();
 const { isLogin } = storeToRefs(userStore);
 
-onMounted(() => {
-  userStore.getUserInfo();
+onMounted(async () => {
+  // 새로고침 시 로그인 상태 복원
+  await userStore.initUserInfo();
 });
 
 </script>

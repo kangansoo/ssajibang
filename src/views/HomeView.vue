@@ -1,7 +1,7 @@
 <script setup>
 import SearchSection from '../components/SearchSection.vue'
 import FeaturedList from '../components/FeaturedList.vue'
-import QuestionAndAnswer from '../components/QuestionAndAnswer.vue'
+import NoticeList from '../components/NoticeList.vue';
 
 
 </script>
@@ -11,7 +11,7 @@ import QuestionAndAnswer from '../components/QuestionAndAnswer.vue'
     <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
       <SearchSection />
       <FeaturedList />
-      <QuestionAndAnswer />
+      <NoticeList />
     </div>
   </div>
 </template>

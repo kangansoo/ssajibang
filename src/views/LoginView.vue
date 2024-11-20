@@ -33,7 +33,6 @@ const handleLogin = async () => {
         // 기타 필요한 정보...
       });
 
-      userStore.setLoginState(true);
       router.push('/');
     }
   } catch (error) {

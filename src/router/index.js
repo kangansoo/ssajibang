@@ -6,6 +6,7 @@ import SignUp from '@/views/SignUp.vue';
 import WriteArticle from '@/views/WriteArticle.vue';
 import MyPage from '@/views/MyPage.vue';
 import ChattingView from '@/views/ChattingView.vue';
+import NoticeView from '@/views/NoticeView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,11 @@ const router = createRouter({
       path: '/chat',
       name: 'chat',
       component: ChattingView
+    },
+    {
+      path: '/notice',
+      name: 'notice',
+      component: NoticeView
     },
   ],
 });
