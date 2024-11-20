@@ -33,7 +33,10 @@ const handleLogin = async () => {
         // 기타 필요한 정보...
       });
 
-      router.push('/');
+      // 리다이렉션 처리
+      const redirectPath = router.currentRoute.value.query.redirect || '/';
+      router.push(redirectPath);
+      // router.push('/');
     }
   } catch (error) {
     console.error('로그인 오류:', error);

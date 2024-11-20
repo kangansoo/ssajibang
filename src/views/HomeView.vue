@@ -1,7 +1,7 @@
 <script setup>
 import SearchSection from '../components/SearchSection.vue'
 import FeaturedList from '../components/FeaturedList.vue'
-import NoticeList from '../components/NoticeList.vue';
+import NoticeList from '../components/notice/NoticeList.vue';
 
 
 </script>

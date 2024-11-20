@@ -1,5 +1,5 @@
 <script setup>
-import NavigationBar from '@/components/NavigationBar.vue'
+import NavigationBar from '@/components/notice/NavigationBar.vue'
 import FooterBar from '@/components/FooterBar.vue'
 import { useRoute } from "vue-router";
 import { computed } from 'vue';
