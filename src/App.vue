@@ -1,5 +1,5 @@
 <script setup>
-import NavigationBar from '@/components/notice/NavigationBar.vue'
+import NavigationBar from '@/components/NavigationBar.vue'
 import FooterBar from '@/components/FooterBar.vue'
 import { useRoute } from "vue-router";
 import { computed } from 'vue';
@@ -10,8 +10,8 @@ const isHomePage = computed(() => route.name === 'Home')
 
 <template>
   <div class="flex flex-col min-h-screen bg-white overflow-x-hidden font-sans">
-    <NavigationBar />
-    <main class="flex flex-grow">
+    <NavigationBar class="z-5"/>
+    <main class="flex flex-grow z-1">
       <RouterView />
     </main>
     <FooterBar v-if="isHomePage"/>

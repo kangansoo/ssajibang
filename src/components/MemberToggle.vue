@@ -39,7 +39,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative" ref="dropdownRef">
+  <div class="relative z-10" ref="dropdownRef">
     <button id="memberName" @click.stop="toggleMenu" class="text-sm text-[#181411] cursor-pointer font-semibold hover:underline">
       {{ userStore.userInfo.name }}님 안녕하세요
     </button>

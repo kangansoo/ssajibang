@@ -10,10 +10,14 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@primevue/themes": "^4.2.2",
     "axios": "^1.7.7",
     "jwt-decode": "^4.0.0",
     "pinia": "^2.2.6",
+    "primevue": "^4.2.2",
+    "quill": "^2.0.2",
     "vue": "^3.5.12",
+    "vue-daum-postcode": "^1.2.1",
     "vue-jwt-decode": "^0.1.0",
     "vue-router": "^4.4.5",
     "vue3-spinners": "^1.2.2"
