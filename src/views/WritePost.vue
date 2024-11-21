@@ -3,10 +3,13 @@ import Editor from 'primevue/editor';
 import { VueDaumPostcode } from "vue-daum-postcode";
 import { ref } from 'vue';
 
-const address = ref(null);
+const jibun = ref(null);
+const roadName = ref(null);
 const postOpen = ref(false);
 const buildingName = ref('');
-const district = ref('');
+const sido = ref(null);
+const sigungu = ref(null);
+const dong = ref(null);
 const rentType = ref('');
 const houseType = ref('');
 const area = ref('');
@@ -21,17 +24,17 @@ const search = () => {
 };
 
 const oncomplete = (result) => {
-  if (result.userSelectedType === 'R') {
-    address.value = result.jibunAddress;
-  }
+  jibun.value = result.jibunAddress;
+  roadName.value = result.jibunAddress;
+  sido.value = result.sido;
+  sigungu.value = result.sigungu
+  dong.value = result.bname;
+  console.log(result);
   postOpen.value = false;
 };
 
-// 시/군/구 목록 (예시)
-const districts = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원도', '충청북도', '충청남도', '전라북도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
-
 // 주택 유형 목록
-const houseTypes = ['아파트', '빌라', '단독주택', '오피스텔', '원룸'];
+const houseTypes = ['빌라', '단독주택', '오피스텔', '원룸'];
 </script>
 
 <template>
@@ -55,13 +58,6 @@ const houseTypes = ['아파트', '빌라', '단독주택', '오피스텔', '원�
         <div>
           <label class="block mb-2">건물 이름</label>
           <input v-model="buildingName" type="text" class="w-full p-2 border rounded">
-        </div>
-
-        <div>
-          <label class="block mb-2">시/군/구</label>
-          <select v-model="district" class="w-full p-2 border rounded">
-            <option v-for="d in districts" :key="d" :value="d">{{ d }}</option>
-          </select>
         </div>
 
         <div>
@@ -115,7 +111,7 @@ const houseTypes = ['아파트', '빌라', '단독주택', '오피스텔', '원�
         <Editor v-model="content" editorStyle="height: 320px" />
       </div>
 
-      <button class="mt-10">제출하기</button>
+      <button class="mt-10 bg-[#f7f4f0] max-w-48 h-10 rounded">제출하기</button>
     </div>
   </div>
 </template>
