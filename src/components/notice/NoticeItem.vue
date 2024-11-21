@@ -20,7 +20,7 @@ defineEmits(['toggle']);
     </div>
     <div
       v-if="notice.isOpen"
-      class="notice-content text-sm text-gray-600 px-7 bg-[#fafafa] py-5"
+      class="notice-content text-sm text-gray-600 px-7 bg-[#fafafa] py-7"
     >
       {{ notice.content }}
     </div>
