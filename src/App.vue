@@ -3,6 +3,7 @@ import NavigationBar from '@/components/NavigationBar.vue'
 import FooterBar from '@/components/FooterBar.vue'
 import { useRoute } from "vue-router";
 import { computed } from 'vue';
+import StickyButton from '@/components/chat/StickyButton.vue';
 
 const route = useRoute()
 const isHomePage = computed(() => route.name === 'Home')
@@ -13,6 +14,7 @@ const isHomePage = computed(() => route.name === 'Home')
     <NavigationBar class="z-5"/>
     <main class="flex flex-grow z-1">
       <RouterView />
+      <StickyButton class="fixed bottom-5 right-5 z-50 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8"/>
     </main>
     <FooterBar v-if="isHomePage"/>
   </div>

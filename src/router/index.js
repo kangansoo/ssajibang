@@ -38,7 +38,7 @@ const router = createRouter({
       component: WritePost
     },
     {
-      path: '/user/:userId',
+      path: '/mypage',
       name: 'mypage',
       // beforeEnter: onlyAuthUser,
       component: MyPage

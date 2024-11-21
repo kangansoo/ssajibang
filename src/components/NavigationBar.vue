@@ -18,8 +18,9 @@ onMounted(async () => {
 <template>
   <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f5f2f0] px-10 py-3">
     <div class="flex items-center gap-4 text-[#181411]">
-      <div class="size-4">
+      <div class="w-[90px]">
         <!-- SVG logo here -->
+        <img src="@/assets/logo.png" alt="logo">
       </div>
       <RouterLink to="/" class="cursor-pointer">
         <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">싸지방</h2>
@@ -30,9 +31,9 @@ onMounted(async () => {
         <template v-if="isLogin">
           <RouterLink
             to="/write"
-            class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#e46d0c] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+            class="flex cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#e46d0c] text-white text-sm font-bold transition duration-300 ease-in-out hover:scale-110"
           >
-            <span class="truncate">매물 등록</span>
+            <p class="truncate">매물 등록</p>
           </RouterLink>
           <MemberToggle :is-open="isOpen" @close="closeMenu" />
         </template>

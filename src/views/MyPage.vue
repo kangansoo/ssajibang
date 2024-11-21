@@ -1,6 +1,14 @@
 <script setup>
+import { useUserStore } from '@/stores/user';
+import { onMounted } from 'vue';
 
+const userStore = useUserStore();
 
+onMounted(async () => {
+  // 새로고침 시 로그인 상태 복원
+  await userStore.initUserInfo();
+  console.log(userStore.userInfo)
+});
 </script>
 
 <template>
