@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import 'primeicons/primeicons.css'
+import ChatWindow from './ChatWindow.vue';
 
 const isOpen = ref(false);
 const isClicked = ref(false);
@@ -27,15 +28,7 @@ const open = () => {
       </Transition>
     </div>
     <Transition name="dropdown">
-      <div v-if="isOpen" class="absolute bottom-full right-6 mb-2 w-64 bg-white rounded-lg shadow-lg p-4">
-        <!-- 드롭다운 내용 -->
-        <h3 class="text-lg font-bold mb-2">드롭다운 메뉴</h3>
-        <ul>
-          <li class="mb-1"><a href="#" class="text-blue-500 hover:underline">메뉴 항목 1</a></li>
-          <li class="mb-1"><a href="#" class="text-blue-500 hover:underline">메뉴 항목 2</a></li>
-          <li class="mb-1"><a href="#" class="text-blue-500 hover:underline">메뉴 항목 3</a></li>
-        </ul>
-      </div>
+      <ChatWindow v-if="isOpen"/>
     </Transition>
   </div>
 </template>
