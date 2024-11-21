@@ -22,7 +22,7 @@ onMounted(async () => {
         <!-- SVG logo here -->
       </div>
       <RouterLink to="/" class="cursor-pointer">
-        <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">RealEstate.com</h2>
+        <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">싸지방</h2>
       </RouterLink>
     </div>
     <div class="flex flex-1 justify-end gap-8">
