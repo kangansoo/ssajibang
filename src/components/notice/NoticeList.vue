@@ -1,29 +1,54 @@
 <script setup>
 import { RouterLink } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { localAxios } from '@/util/http-commons';
 
-const questions = [
-      { id: 1, avatar: "https://cdn.usegalileo.ai/stability/a7f41980-fa9b-48a9-8701-76906f01f828.png", text: "Is this property pet friendly?", askedBy: "Jessica", date: "10/12/2023" },
-      { id: 2, avatar: "https://cdn.usegalileo.ai/stability/9f9d170f-b50b-4f1e-a90a-c00e4ab50e19.png", text: "What are the nearby schools?", askedBy: "Michael", date: "10/11/2023" },
-      { id: 3, avatar: "https://cdn.usegalileo.ai/stability/2d343623-8434-4f2c-8a1a-d355ad63d951.png", text: "How is the traffic around this area?", askedBy: "Lisa", date: "10/10/2023" },
-      { id: 4, avatar: "https://cdn.usegalileo.ai/stability/2c9e2cb1-7262-4674-b4a5-6af398d4f508.png", text: "What are the crime rates in this neighborhood?", askedBy: "David", date: "10/09/2023" },
-    ]
+// 데이터와 상태 정의
+const notices = ref([]); // 공지사항 목록
+const pageSize = ref(5); // 한 페이지에 보여줄 항목 수
+
+// 데이터 가져오기
+const fetchNotices = async (page = 1) => {
+  try {
+    const response = await localAxios().get('/notices', {
+      params: { page, size: pageSize.value }, // 서버로 현재 페이지와 페이지 크기 전달
+    });
+
+    // 서버에서 데이터 받아오기
+    const data = response.data;
+
+    // 공지사항 데이터 초기화
+    notices.value = data.noticeList.map(notice => ({
+      ...notice,
+      isOpen: false,
+      date: new Date(notice.createdAt).toLocaleDateString(), // 날짜 포맷팅
+    }));
+  } catch (error) {
+    console.error('공지사항 데이터를 불러오는 데 실패했습니다:', error);
+  }
+};
+
+
+onMounted(fetchNotices);
 </script>
-
 
 <template>
   <div>
     <h2 class="text-[#181411] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">공지사항</h2>
-    <div v-for="question in questions" :key="question.id" class="flex items-center gap-4 bg-white px-4 min-h-[72px] py-2">
-      <div class="flex flex-col justify-center">
-        <p class="text-[#181411] text-base font-medium leading-normal line-clamp-1">{{ question.text }}</p>
-        <p class="text-[#8a7360] text-sm font-normal leading-normal line-clamp-2">Asked by {{ question.askedBy }} on {{ question.date }}</p>
-      </div>
-    </div>
-    <div class="flex justify-end font-semibold">
+    <div v-for="notice in notices" :key="notice.id" class="flex items-center justify-between gap-4 bg-white px-4 min-h-[72px] py-2">
       <RouterLink to="/notice">
-        <p class="font-semibold cursor-pointer">더보기</p>
+        <div class="flex flex-col justify-center">
+          <p class="text-[#181411] text-base font-medium leading-normal line-clamp-1">{{ notice.title }}</p>
+          <p class="text-[#8a7360] text-sm font-normal leading-normal">on {{ notice.createdAt.substring(0, 10).replace(/-/g, '/') }}</p>
+        </div>
+      </RouterLink>
+    </div>
+    <div class="flex px-4 py-3 justify-end">
+      <RouterLink to="/notice">
+        <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f5f2f0] text-[#181411] text-sm font-bold leading-normal tracking-[0.015em]">
+        <span class="truncate">더보기</span>
+      </button>
       </RouterLink>
     </div>
   </div>
 </template>
-

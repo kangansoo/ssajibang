@@ -18,18 +18,15 @@ const fetchNotices = async (page = 1) => {
 
     // 서버에서 데이터 받아오기
     const data = response.data;
-    console.log('Fetched Data:', data);
+    console.log(data)
+    totalNotice.value = response.data.totalNotice;
 
     // 공지사항 데이터 초기화
-    totalNotice.value = data.totalNotice; // 전체 공지 개수
     notices.value = data.noticeList.map(notice => ({
       ...notice,
       isOpen: false,
       date: new Date(notice.createdAt).toLocaleDateString(), // 날짜 포맷팅
     }));
-
-    console.log("Total Notices:", totalNotice.value);
-    console.log("Notices Length:", notices.value.length);
   } catch (error) {
     console.error('공지사항 데이터를 불러오는 데 실패했습니다:', error);
   }
