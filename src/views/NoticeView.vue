@@ -86,7 +86,7 @@ onMounted(fetchNotices);
       <!-- 페이지네이션 -->
       <div class="mt-6 flex justify-center space-x-2">
         <button
-          class="px-3 py-1 rounded border bg-gray-200"
+          class="px-3 py-1 rounded border bg-[#f5f2f0]"
           :disabled="currentPage === 1"
           @click="changePage(currentPage - 1)"
         >
@@ -96,7 +96,7 @@ onMounted(fetchNotices);
           {{ currentPage }} / {{ Math.ceil(totalNotice / pageSize) }}
         </span>
         <button
-          class="px-3 py-1 rounded border bg-gray-200"
+          class="px-3 py-1 rounded border bg-[#f5f2f0]"
           :disabled="currentPage >= Math.ceil(totalNotice / pageSize)"
           @click="changePage(currentPage + 1)"
         >
