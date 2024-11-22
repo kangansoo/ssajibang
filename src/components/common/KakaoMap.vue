@@ -1,6 +1,7 @@
 <script setup>
 import { KakaoMap } from 'vue3-kakao-maps';
 import { ref } from 'vue';
+import { debounce } from 'lodash';
 
 const mapWidth = ref('100%');
 const mapHeight = ref('100%');
@@ -23,14 +24,6 @@ const onLoadKakaoMap = (mapRef) => {
     console.log(`${idx.value++}:북동쪽 좌표: ${ne.getLat()}, ${ne.getLng()}`);
   }, 300));
 };
-
-function debounce(func, wait) {
-  let timeout;
-  return function(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
 </script>
 
 <template>
