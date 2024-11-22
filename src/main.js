@@ -9,11 +9,13 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import VueDaumPostcode from 'vue-daum-postcode'
 import { useKakao } from 'vue3-kakao-maps/@utils';
+import _ from 'lodash'
 
 const kakaoKey = import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY;
 
 const app = createApp(App)
 
+app.config.globalProperties.$_ = _
 useKakao(kakaoKey);
 app.use(createPinia())
 app.use(router)
