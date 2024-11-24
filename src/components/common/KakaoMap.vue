@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { KakaoMap, KakaoMapInfoWindow, KakaoMapMarker } from 'vue3-kakao-maps';
 import { debounce } from 'lodash';
 import { localAxios } from '@/util/http-commons';
+import { useMapStore } from '@/stores/map';
 
 // 첨부된 JSON 파일 import (경로는 실제 파일 위치에 맞게 조정해주세요)
 import sido from '@/assets/polygon/sido.json';
@@ -18,12 +19,14 @@ const markers = ref([]);
 const level = ref(6);
 const poligonLevel= ref();
 
+const mapStore = useMapStore();
+
 const onLoadKakaoMap = (mapRef) => {
   map.value = mapRef;
   const mapTypeControl = new kakao.maps.MapTypeControl();
   map.value.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
-  displayAreas();
+  // displayAreas();
 
   kakao.maps.event.addListener(map.value, 'idle', debounce(() => {
     fetchMarkers();
@@ -39,38 +42,38 @@ const onLoadKakaoMap = (mapRef) => {
   }, 300));
 };
 
-const displayAreas = () => {
-  if(level.value>=10){
-    poligonLevel.value = sido;
-  } else if(level.value>=6){
-    poligonLevel.value = sig;
-  }
-  poligonLevel.value.features.forEach(feature => {
-    const coordinates = feature.geometry.coordinates[0];
-    const path = coordinates.map(coord => new kakao.maps.LatLng(coord[1], coord[0]));
+// const displayAreas = () => {
+//   if(level.value>=10){
+//     poligonLevel.value = sido;
+//   } else if(level.value>=6){
+//     poligonLevel.value = sig;
+//   }
+//   poligonLevel.value.features.forEach(feature => {
+//     const coordinates = feature.geometry.coordinates[0];
+//     const path = coordinates.map(coord => new kakao.maps.LatLng(coord[1], coord[0]));
 
-    const polygon = new kakao.maps.Polygon({
-      path: path,
-      strokeWeight: 2,
-      strokeColor: '#004c80',
-      strokeOpacity: 0.8,
-      fillColor: '#fff',
-      fillOpacity: 0.01
-    });
+//     const polygon = new kakao.maps.Polygon({
+//       path: path,
+//       strokeWeight: 2,
+//       strokeColor: '#004c80',
+//       strokeOpacity: 0.8,
+//       fillColor: '#fff',
+//       fillOpacity: 0.01
+//     });
 
-    polygon.setMap(map.value);
+//     polygon.setMap(map.value);
 
-    const area = Math.floor(polygon.getArea());
-    const name = feature.properties.SIG_KOR_NM;
+//     const area = Math.floor(polygon.getArea());
+//     const name = feature.properties.SIG_KOR_NM;
 
-    kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
-      infoLat.value = mouseEvent.latLng.getLat();
-      infoLng.value = mouseEvent.latLng.getLng();
-      content.value = `${name}의 총 면적 : 약 ${area.toLocaleString()}m<sup>2</sup>`;
-      infoVisible.value = true;
-    });
-  });
-};
+//     kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
+//       infoLat.value = mouseEvent.latLng.getLat();
+//       infoLng.value = mouseEvent.latLng.getLng();
+//       content.value = `${name}의 총 면적 : 약 ${area.toLocaleString()}m<sup>2</sup>`;
+//       infoVisible.value = true;
+//     });
+//   });
+// };
 
 const fetchMarkers = async () => {
   console.log('fetchMarkers 호출됨');
@@ -87,18 +90,13 @@ const fetchMarkers = async () => {
         swLng: sw.getLng(),
       }
     });
-    console.log('마커 데이터:', response.data);
-    // 기존 마커 제거
-    markers.value.forEach(marker => marker.setMap(null));
-    markers.value = [];
 
-    // 새 마커 생성
-    response.data.forEach(item => {
-      markers.value.push({
-        lat: item.lat,
-        lng: item.lng
-      });
-    });
+    mapStore.updateMapData(response.data);
+    
+    markers.value = response.data.homeList.map(item => ({
+      lat: item.lat,
+      lng: item.lng
+    }));
   } catch (error) {
     console.error('마커 데이터를 불러오는 데 실패했습니다:', error);
   }
