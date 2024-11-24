@@ -26,7 +26,7 @@ const onLoadKakaoMap = (mapRef) => {
   const mapTypeControl = new kakao.maps.MapTypeControl();
   map.value.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
-  // displayAreas();
+  fetchMarkers();
 
   kakao.maps.event.addListener(map.value, 'idle', debounce(() => {
     fetchMarkers();
@@ -102,11 +102,11 @@ const fetchMarkers = async () => {
   }
 };
 
-onMounted(() => {
-  if (map.value) {
-    displayAreas();
-  }
-});
+// onMounted(() => {
+//   if (map.value) {
+//     fetchMarkers();
+//   }
+// });
 </script>
 
 <template>
