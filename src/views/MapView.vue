@@ -2,45 +2,26 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import VKakaoMap from "@/components/common/VKakaoMap.vue";
-import ResultMenu from '@/components/ResultMenu.vue';
-import SearchFilter from '@/components/SearchFilter.vue';
-import KakaoMap from '@/components/common/KakaoMap.vue';
+import ResultMenu from "@/components/ResultMenu.vue";
+import SearchFilter from "@/components/SearchFilter.vue";
+import KakaoMap from "@/components/common/KakaoMap.vue";
+import DetailView from "@/components/realestate/DetailView.vue";
+import "primeicons/primeicons.css";
+
+const selectedId = ref(null);
 
 const route = useRoute();
-const searchQuery = ref('');
+const searchQuery = ref("");
 const chargingStations = ref([]);
 const selectStation = ref({});
 
-// onMounted(() => {
-//   if (route.query.search) {
-//     searchQuery.value = route.query.search;
-//     performSearch();
-//   }
-// });
+const handleItemClick = (id) => {
+  selectedId.value = id;
+};
 
-// watch(() => route.query.search, (newSearch) => {
-//   if (newSearch) {
-//     searchQuery.value = newSearch;
-//     performSearch();
-//   }
-// });
-
-// const performSearch = async () => {
-//   console.log("Searching for:", searchQuery.value);
-//   // 예: Kakao API를 호출하여 검색 결과 가져오기
-//   const ps = new kakao.maps.services.Places();
-//   ps.keywordSearch(searchQuery.value, (data, status) => {
-//     if (status === kakao.maps.services.Status.OK) {
-//       chargingStations.value = data.map(item => ({
-//         lat: parseFloat(item.y),
-//         lng: parseFloat(item.x),
-//         name: item.place_name,
-//       }));
-//     } else {
-//       chargingStations.value = []; // 검색 결과 없음
-//     }
-//   });
-// };
+const closeDetail = () => {
+  selectedId.value = null;
+};
 </script>
 
 <template>
@@ -49,11 +30,35 @@ const selectStation = ref({});
     <div class="h-[50px] border-b border-solid border-[#f5f2f0]">
       <SearchFilter />
     </div>
-    <!-- 기존 콘텐츠 -->
-    <div class="flex flex-grow max-h-[calc(100vh-115px)]">
-      <div class="w-[400px] flex-shrink-0 border-r border-solid border-[#f5f2f0] h-full">
-        <ResultMenu/>
+    <!-- 콘텐츠 영역 -->
+    <div class="flex flex-grow max-h-[calc(100vh-115px)] relative">
+      <!-- ResultMenu 영역 -->
+      <div
+        class="w-[400px] flex-shrink-0 border-r border-solid border-[#f5f2f0] h-full z-20"
+      >
+        <ResultMenu @item-click="handleItemClick" />
       </div>
+
+      <!-- DetailView 슬라이드 영역 -->
+      <div
+        class="absolute top-0 left-[400px] h-full w-[400px] z-10 bg-white border-r border-solid border-[#f5f2f0] transition-transform duration-300"
+        :class="{ 'translate-x-0': selectedId, '-translate-x-full': !selectedId }"
+      >
+        <DetailView :selectedId="selectedId" class="h-full w-full" />
+        <div
+          class="absolute top-1/2 right-[-32px] transform -translate-y-1/2 z-10"
+        >
+          <div
+            class="bg-white p-2 rounded-r-md cursor-pointer shadow-lg border-white"
+            @click="closeDetail"
+            v-show="selectedId"
+          >
+            <i class="pi pi-angle-double-left text-black"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- KakaoMap 영역 -->
       <div class="flex-grow flex justify-end h-full">
         <KakaoMap />
       </div>

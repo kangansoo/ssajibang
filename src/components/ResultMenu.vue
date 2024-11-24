@@ -35,7 +35,7 @@ const formatPrice = (price) => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full bg-white">
     <!-- 리스트 -->
     <div
       class="flex-grow overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200"
@@ -43,7 +43,8 @@ const formatPrice = (price) => {
       <div
         v-for="item in paginatedHomeList"
         :key="item.id"
-        class="p-4 border-b border-gray-200"
+        class="p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+        @click="$emit('item-click', item.id)"
       >
         <img
           :src="item.img"
