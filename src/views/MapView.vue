@@ -50,11 +50,11 @@ const selectStation = ref({});
       <SearchFilter />
     </div>
     <!-- 기존 콘텐츠 -->
-    <div class="flex flex-grow">
-      <div class="w-[400px] flex-shrink-0 border-r border-solid border-[#f5f2f0]">
+    <div class="flex flex-grow max-h-[calc(100vh-115px)]">
+      <div class="w-[400px] flex-shrink-0 border-r border-solid border-[#f5f2f0] h-full">
         <ResultMenu/>
       </div>
-      <div class="flex-grow flex justify-end">
+      <div class="flex-grow flex justify-end h-full">
         <KakaoMap />
       </div>
     </div>

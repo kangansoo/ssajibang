@@ -92,7 +92,7 @@ const fetchMarkers = async () => {
     });
 
     mapStore.updateMapData(response.data);
-    
+    console.log("데이터: ", response.data);
     markers.value = response.data.homeList.map(item => ({
       lat: item.lat,
       lng: item.lng
