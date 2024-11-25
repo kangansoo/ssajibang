@@ -1,39 +1,24 @@
 <script setup>
 import { ref } from 'vue';
-import 'primeicons/primeicons.css'
+import { useChatStore } from '@/stores/chat';
+import 'primeicons/primeicons.css';
 import ChatList from './ChatList.vue';
 import ChatRoom from './ChatRoom.vue';
 
-const activeTab = ref('home');
-const chatList = ref([
-  { id: 1, name: '김철수', lastMessage: '안녕하세요!', time: '10:30' },
-  { id: 2, name: '이영희', lastMessage: '오늘 회의 몇 시에요?', time: '09:15' },
-  { id: 3, name: '박지성', lastMessage: '프로젝트 진행상황 어떤가요?', time: '어제' },
-]);
-const currentChat = ref(null);
-const messages = ref([]);
+const chatStore = useChatStore();  // Pinia 스토어 가져오기
 
+const activeTab = ref('home');
 const setActiveTab = (tab) => {
   activeTab.value = tab;
 };
 
 const selectChat = (chat) => {
-  currentChat.value = chat;
+  chatStore.selectChat(chat);
   activeTab.value = 'chat';
-  // 실제 구현에서는 여기서 채팅 메시지를 불러오는 로직이 필요합니다.
-  messages.value = [
-    { id: 1, sender: chat.name, content: '안녕하세요!', time: '10:35' },
-    { id: 2, sender: '나', content: '네, 안녕하세요!', time: '10:36' },
-  ];
 };
 
 const sendMessage = (content) => {
-  messages.value.push({
-    id: messages.value.length + 1,
-    sender: '나',
-    content: content,
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  });
+  chatStore.sendMessage(content);
 };
 </script>
 
@@ -44,8 +29,8 @@ const sendMessage = (content) => {
       <div class="flex-grow overflow-y-auto relative">
         <Transition name="fade" mode="out-in">
           <div :key="activeTab">
-            <ChatList v-if="activeTab === 'home'" :chatList="chatList" @selectChat="selectChat" />
-            <ChatRoom v-if="activeTab === 'chat'" :currentChat="currentChat" :messages="messages" @sendMessage="sendMessage" />
+            <ChatList v-if="activeTab === 'home'" :chatList="chatStore.chatList" @selectChat="selectChat" />
+            <ChatRoom v-if="activeTab === 'chat'" :currentChat="chatStore.currentChat" :messages="chatStore.messages" @sendMessage="sendMessage" />
             <div v-if="activeTab === 'chatbot'">
               <h2 class="text-xl font-semibold mb-2">챗봇</h2>
               <p>여기에 챗봇 컨텐츠를 넣으세요.</p>
