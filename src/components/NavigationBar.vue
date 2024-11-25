@@ -18,12 +18,14 @@ onMounted(async () => {
 <template>
   <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f5f2f0] px-10 py-3">
     <div class="flex items-center gap-4 text-[#181411]">
-      <div class="w-[90px]">
-        <!-- SVG logo here -->
-        <img src="@/assets/logo.png" alt="logo">
-      </div>
       <RouterLink to="/" class="cursor-pointer">
-        <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">싸지방</h2>
+        <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">
+          <!-- 싸지방 -->
+          <div class="w-[90px]">
+          <!-- SVG logo here -->
+            <img src="@/assets/logo.png" alt="logo">
+          </div>
+        </h2>
       </RouterLink>
     </div>
     <div class="flex flex-1 justify-end gap-8">

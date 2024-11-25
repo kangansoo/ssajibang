@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 export const useMapStore = defineStore('map', {
   state: () => ({
+    tab:'normal',
     currentPage: 1,
     totalPage: 0,
     totalCnt: 0,
@@ -16,6 +17,9 @@ export const useMapStore = defineStore('map', {
       this.totalPage = data.totalPage
       this.totalCnt = data.totalCnt
       this.homeList = data.homeList
+    },
+    setTab(tab){
+      this.tab=tab;
     }
   }
 })

@@ -1,11 +1,20 @@
 <!-- SearchFilter.vue -->
 <script setup>
 import { ref } from 'vue';
+import { useMapStore } from '@/stores/map.js';
 
 const searchQuery = ref('');
 const priceRange = ref('');
 const rentType = ref('');
 const areaRange = ref('');
+const selectedTab = ref('normal');
+
+const mapStore = useMapStore();
+
+const selectTab = (tab) => {
+  selectedTab.value = tab;
+  mapStore.setTab(tab);
+};
 
 const rentTypes = ['월세', '전세'];
 const priceRanges = ['0-5만원', '5-10만원', '10-15만원', '15-20만원', '20만원 이상'];
@@ -14,6 +23,27 @@ const areaRanges = ['0-10m²', '10-20m²', '20-30m²', '30-40m²', '40m² 이상
 
 <template>
   <div class="flex items-center px-4 h-full gap-5">
+
+    <div
+      class="w-[100px] cursor-pointer py-2 text-center rounded-lg hover:bg-[#e46d0c] hover:text-white"
+      :class="{
+        'bg-[#e46d0c] text-white': selectedTab === 'normal',
+        'bg-white text-black': selectedTab !== 'normal'
+      }"
+      @click="selectTab('normal')"
+    >
+      일반 매물
+    </div>
+    <div
+      class="w-[100px] cursor-pointer py-2 text-center rounded-lg hover:bg-[#e46d0c] hover:text-white"
+      :class="{
+        'bg-[#e46d0c] text-white': selectedTab === 'ssafy',
+        'bg-white text-black': selectedTab !== 'ssafy'
+      }"
+      @click="selectTab('ssafy')"
+    >
+      싸피 매물
+    </div>
     <!-- 검색 입력 -->
     <div class="relative">
       <input
