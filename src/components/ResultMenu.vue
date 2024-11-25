@@ -38,7 +38,7 @@ const formatPrice = (price) => {
   <div class="flex flex-col h-full bg-white">
     <!-- 리스트 -->
     <div
-      class="flex-grow overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200"
+      class="flex-grow overflow-y-auto scroll"
     >
       <div
         v-for="item in paginatedHomeList"
@@ -83,7 +83,7 @@ const formatPrice = (price) => {
         이전
       </button>
       <span class="text-sm font-medium">
-        {{ currentPage }} / {{ totalPages }} (총 {{ mapStore.totalCnt }}개)
+        {{ currentPage }} / {{ totalPages }}
       </span>
       <button
         @click="nextPage"
@@ -95,3 +95,19 @@ const formatPrice = (price) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.scroll::-webkit-scrollbar {
+    width: 5px;  /* 스크롤바의 너비 */
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    height: 30%; /* 스크롤바의 길이 */
+    background: #d4d4d4; /* 스크롤바의 색상 */
+    border-radius: 10px;
+}
+
+.scroll::-webkit-scrollbar-track {
+    background: none;  /*스크롤바 뒷 배경 색상*/
+}
+</style>
