@@ -1,19 +1,49 @@
 <script setup>
-  const listings = [
-      { id: 1, image: "https://cdn.usegalileo.ai/sdxl10/be2cccbe-3272-4116-b725-2cd5cbc9a8f5.png", details: "장덕동 1440" },
-      { id: 2, image: "https://cdn.usegalileo.ai/sdxl10/ed3a249d-88e7-4a52-b504-9dd9ba7378f6.png", details: "하남동 1024" },
-      { id: 3, image: "https://cdn.usegalileo.ai/sdxl10/1ebf5af0-a85a-47fb-a8b4-80053664e92a.png", details: "수완동 23" },
-      { id: 4, image: "https://cdn.usegalileo.ai/sdxl10/7597cd39-e530-4ff9-abb0-100dcfc428e8.png", details: "장덕동 1002" },
-    ]
-</script>
+import { ref } from 'vue';
+import { localAxios } from '@/util/http-commons';
+import { useRoute } from 'vue-router';
 
+const markers = ref([]);
+const currentPage = ref(1);
+const route = useRoute();
+
+const getFeatured = async () => {
+
+  try {
+    const response = await localAxios().get('/home/ssafy', {
+      params: {
+        page: currentPage.value,
+        bCode: route.query.bCode || '',
+      },
+    });
+
+    console.log("응답데이터: ", response.data);
+    console.log("이미지: ", response.data.homeList[0].imgList[0].url);
+
+    // 응답 데이터에서 첫 4개의 항목만 가져와서 하나의 배열에 담기
+    markers.value = response.data.homeList.slice(0, 4).map(item => ({
+      id: item.id,
+      image: item.imgList[0].url, // 첫 번째 이미지만 사용
+      details: item.title, // title을 사용 (상세 정보는 필요한 필드로 변경 가능)
+    }));
+
+  } catch (error) {
+    console.error('Failed to fetch marker data:', error);
+  }
+};
+
+getFeatured(); // 초기 데이터 로드
+</script>
 
 <template>
   <div>
     <h2 class="text-[#181411] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Listings</h2>
     <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-      <div v-for="listing in listings" :key="listing.id" class="flex flex-col gap-1 pb-3">
-        <div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl" :style="{ backgroundImage: `url('${listing.image}')` }"></div>
+      <div v-for="listing in markers" :key="listing.id" class="flex flex-col gap-1 pb-3">
+        <!-- 이미지를 listing.image로 수정 -->
+        <div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-l">
+          <img :src='listing.image' alt="Property Image" class="w-full h-full"/>
+        </div>
         <p class="text-[#181411] text-center text-base font-medium leading-normal">{{ listing.details }}</p>
       </div>
     </div>
@@ -24,4 +54,3 @@
     </div>
   </div>
 </template>
-
