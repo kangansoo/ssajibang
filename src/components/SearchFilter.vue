@@ -1,15 +1,16 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useMapStore } from '@/stores/map.js';
 
 const searchQuery = ref('');  // 지역 또는 지하철역 검색
 const priceRange = ref('');   // 가격대
 const rentType = ref('');     // 임대 유형 (월세/전세)
 const areaRange = ref('');    // 면적 범위
-const selectedTab = ref('normal');  // 탭 선택 (일반 매물 / 싸피 매물)
+const selectedTab = ref('');  // 탭 선택 (일반 매물 / 싸피 매물)
 const roomType = ref('');  // 방 종류
 
 const mapStore = useMapStore();
+const currentTab = computed(()=>mapStore.tab);
 
 // 필터링 탭 변경
 const selectTab = (tab) => {
@@ -46,8 +47,8 @@ watch(() => mapStore.homeList, (newHomeList) => {
     <div
       class="w-[100px] cursor-pointer py-2 text-center rounded-lg hover:bg-[#e46d0c] hover:text-white"
       :class="{
-        'bg-[#e46d0c] text-white': selectedTab === 'normal',
-        'bg-white text-black': selectedTab !== 'normal'
+        'bg-[#e46d0c] text-white': currentTab === 'normal',
+        'bg-white text-black': currentTab !== 'normal'
       }"
       @click="selectTab('normal')"
     >
@@ -56,8 +57,8 @@ watch(() => mapStore.homeList, (newHomeList) => {
     <div
       class="w-[100px] cursor-pointer py-2 text-center rounded-lg hover:bg-[#e46d0c] hover:text-white"
       :class="{
-        'bg-[#e46d0c] text-white': selectedTab === 'ssafy',
-        'bg-white text-black': selectedTab !== 'ssafy'
+        'bg-[#e46d0c] text-white': currentTab === 'ssafy',
+        'bg-white text-black': currentTab !== 'ssafy'
       }"
       @click="selectTab('ssafy')"
     >
