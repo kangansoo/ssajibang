@@ -2,6 +2,7 @@
 import Editor from 'primevue/editor';
 import { VueDaumPostcode } from "vue-daum-postcode";
 import { ref } from 'vue';
+import { localAxios } from '@/util/http-commons'; // Axios import
 
 const jibun = ref(null);
 const roadName = ref(null);
@@ -18,23 +19,62 @@ const monthlyRent = ref('');
 const floor = ref('');
 const contractDate = ref('');
 const constructionYear = ref('');
+const content = ref('');
+const images = ref([]); // 이미지 배열
 
+const houseTypes = ['빌라', '단독주택', '오피스텔', '원룸'];
+
+// 주소 검색
 const search = () => {
   postOpen.value = true;
 };
 
+// 주소 검색 완료 후
 const oncomplete = (result) => {
   jibun.value = result.jibunAddress;
   roadName.value = result.jibunAddress;
   sido.value = result.sido;
-  sigungu.value = result.sigungu
+  sigungu.value = result.sigungu;
   dong.value = result.bname;
-  console.log(result);
   postOpen.value = false;
 };
 
-// 주택 유형 목록
-const houseTypes = ['빌라', '단독주택', '오피스텔', '원룸'];
+// 제출 버튼 클릭 시 API 요청
+const submitPost = async () => {
+  try {
+    const homeReq = {
+      address: jibun.value, // 주소
+      rentType: rentType.value === '전세' ? 'YEARLY_RENT' : 'MONTHLY_RENT', // 전월세 구분
+      deposit: deposit.value, // 보증금
+      monthlyRent: monthlyRent.value, // 월세
+      maintenanceCost: 0, // 유지비 (추후 추가 필드 필요)
+      title: buildingName.value, // 건물 이름을 제목으로 사용
+      content: content.value, // 상세 설명
+      roomType: houseType.value, // 주택 유형
+      exclusiveArea: area.value, // 전용 면적
+      floor: floor.value, // 층수
+      roomCnt: 0, // 방 개수 (필요한 경우 추가)
+      bathroomCnt: 0, // 화장실 개수 (필요한 경우 추가)
+      direction: '', // 방향 (필요한 경우 추가)
+      expirationDate: contractDate.value, // 계약 만료일
+      availableFrom: '', // 입주 가능일 (추후 추가 필드 필요)
+      homeType: houseType.value, // 주택 유형
+      approvalDate: new Date().toISOString(), // 승인 날짜
+    };
+
+    const requestData = {
+      homeReq,
+      images: images.value, // 이미지 데이터
+    };
+
+    // API 요청 보내기
+    const response = await localAxios().post('/home/ssafy', requestData);
+    console.log("Response: ", response.data);
+    // 요청 성공 후 처리 (예: 알림, 페이지 이동 등)
+  } catch (error) {
+    console.error('게시물 제출 중 오류 발생:', error);
+  }
+};
 </script>
 
 <template>
@@ -111,7 +151,8 @@ const houseTypes = ['빌라', '단독주택', '오피스텔', '원룸'];
         <Editor v-model="content" editorStyle="height: 320px" />
       </div>
 
-      <button class="mt-10 bg-[#f7f4f0] max-w-48 h-10 rounded">제출하기</button>
+      <!-- 제출 버튼 -->
+      <button @click="submitPost" class="mt-10 bg-[#f7f4f0] max-w-48 h-10 rounded">제출하기</button>
     </div>
   </div>
 </template>
