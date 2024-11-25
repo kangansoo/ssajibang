@@ -17,8 +17,9 @@ const selectTab = (tab) => {
 };
 
 const rentTypes = ['월세', '전세'];
-const priceRanges = ['0-5만원', '5-10만원', '10-15만원', '15-20만원', '20만원 이상'];
-const areaRanges = ['0-10m²', '10-20m²', '20-30m²', '30-40m²', '40m² 이상'];
+const priceRanges = ['0-30만원', '30-50만원', '50-70만원', '70-100만원', '100만원 이상'];
+const areaRanges = ['0-20m²', '20-30m²', '30-40m²', '40-50m²', '50m² 이상'];
+const roomType = ['원룸', '투룸', '투룸 이상'];
 </script>
 
 <template>

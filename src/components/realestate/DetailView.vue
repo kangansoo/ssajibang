@@ -10,6 +10,7 @@ const props = defineProps({
 });
 
 const mapStore = useMapStore();
+const currentTab = computed(() => mapStore.tab); // 현재 탭 확인
 
 const selectedItem = computed(() => {
   return mapStore.homeList.find(item => item.id === props.selectedId);
@@ -21,9 +22,14 @@ const formatPrice = (price) => {
 </script>
 
 <template>
-  <div v-if="selectedItem" class="felx flex-col w-full h-full p-4 border-r overflow-y-auto scroll relative align-center">
+  <div v-if="selectedItem" class="flex flex-col w-full h-full p-4 border-r overflow-y-auto scroll relative align-center">
     <div class="w-[300px] h-[300px]">
-        <img :src="selectedItem.img" :alt="selectedItem.title" class="w-full h-64 object-cover mb-4 rounded">
+      <!-- 이미지 -->
+      <img
+        :src="currentTab === 'normal' ? selectedItem.img : selectedItem.imgList[0]?.url"
+        alt="매물 이미지"
+        class="w-full h-64 object-cover mb-4 rounded"
+      />
     </div>
     <p class="text-xs">{{ selectedItem.address }}</p>
     <h2 class="text-2xl font-bold mb-1">
@@ -36,6 +42,7 @@ const formatPrice = (price) => {
       </span>
     </h2>
     <p class="mb-2 text-sm">관리비: {{ formatPrice(selectedItem.maintenanceCost) }}만원</p>
+    <!-- <p v-if="currentTab === 'ssafy'" class="text-sm text-gray-600 mb-2">작성자: {{ selectedItem.member.name }}</p> -->
 
     <hr>
     <p class="text-sm mt-2 mb-2">{{ selectedItem.title }}</p>
@@ -45,7 +52,9 @@ const formatPrice = (price) => {
     <p class="mb-2 text-sm">방향: {{ selectedItem.direction }}</p>
     <p class="mb-2 text-sm">입주 가능일: {{ selectedItem.availableFrom }}</p>
     <p class="mb-2 text-sm">건물 유형: {{ selectedItem.homeType }}</p>
-    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t">
+    <p v-if="currentTab === 'ssafy'" class="text-wrap">{{ selectedItem.content }}</p>
+    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t"
+        v-if="currentTab === 'ssafy'">
       <button class="w-full py-2 bg-[#e46d0c] text-white rounded hover:bg-[#e4830c] transition duration-300">작성자에게 문의하기</button>
     </div>
   </div>
@@ -53,6 +62,7 @@ const formatPrice = (price) => {
     <p class="text-xl text-gray-500">매물을 선택해주세요</p>
   </div>
 </template>
+
 
 <style scoped>
 .scroll::-webkit-scrollbar {

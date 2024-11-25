@@ -7,22 +7,24 @@ import { useRoute } from 'vue-router';
 import { useMapStore } from '@/stores/map';
 
 const map = ref();
-const infoLat = ref(35.20417749784532);
-const infoLng = ref(126.81108903431071);
 const markers = ref([]);
-const selectedId = ref(null);  // 선택된 마커의 id
-
 const mapStore = useMapStore();
-const currentPage = computed(() => mapStore.currentPage);
 const route = useRoute();
 
+const currentPage = computed(() => mapStore.currentPage);
+const currentTab = computed(() => mapStore.tab); // 현재 탭 확인
+
+// 데이터 조회 함수
 const fetchMarkers = async () => {
+  console.log("fetchMarkers 실행", { currentPage: currentPage.value, currentTab: currentTab.value });
   const bounds = map.value.getBounds();
   const sw = bounds.getSouthWest();
   const ne = bounds.getNorthEast();
 
+  const endpoint = currentTab.value === 'normal' ? '/home/dabang' : '/home/ssafy'; // 탭에 따른 엔드포인트
+
   try {
-    const response = await localAxios().get('/home/dabang', {
+    const response = await localAxios().get(endpoint, {
       params: {
         page: currentPage.value,
         neLat: ne.getLat(),
@@ -35,7 +37,8 @@ const fetchMarkers = async () => {
 
     console.log("응답데이터: ", response.data);
     mapStore.updateMapData(response.data);
-    markers.value = response.data.homeList.map(item => ({
+
+    markers.value = response.data.homeList.map((item) => ({
       lat: item.lat,
       lng: item.lng,
       id: item.id,
@@ -45,7 +48,7 @@ const fetchMarkers = async () => {
   }
 };
 
-watch(() => currentPage.value, fetchMarkers);
+watch(() => [currentPage.value, currentTab.value], fetchMarkers); // 탭 변경 시 데이터 새로 가져오기
 
 const onLoadKakaoMap = (mapRef) => {
   map.value = mapRef;
@@ -54,42 +57,23 @@ const onLoadKakaoMap = (mapRef) => {
 
   fetchMarkers();
 
-  kakao.maps.event.addListener(map.value, 'idle', debounce(() => {
-    mapStore.setCurrentPage(1);
-    fetchMarkers();
-  }, 300));
-
-  kakao.maps.event.addListener(map.value, 'dragend', () => {
-    mapStore.setCurrentPage(1);
-    fetchMarkers();
-  });
-};
-
-// 중심 이동 메서드 추가
-const moveToMarker = ({ lat, lng }) => {
-  if (map.value) {
-    const center = new kakao.maps.LatLng(lat, lng);
-    map.value.setCenter(center);
-  }
-};
-
-// 마커 클릭 시 상세 정보 페이지로 이동하는 메서드
-const handleMarkerClick = (id) => {
-  selectedId.value = id;
-  // 마커 클릭 시 해당 id로 이동하는 로직 추가
-  moveToMarker({ lat: markers.value.find(marker => marker.id === id).lat, lng: markers.value.find(marker => marker.id === id).lng });
+  kakao.maps.event.addListener(map.value, 'idle', debounce(fetchMarkers, 300));
 };
 
 defineExpose({
-  moveToMarker,
-  handleMarkerClick, // 클릭 핸들러 외부 노출
+  moveToMarker: ({ lat, lng }) => {
+    if (map.value) {
+      const center = new kakao.maps.LatLng(lat, lng);
+      map.value.setCenter(center);
+    }
+  },
 });
 </script>
 
 <template>
   <KakaoMap
-    :lat="infoLat"
-    :lng="infoLng"
+    :lat="35.20417749784532"
+    :lng="126.81108903431071"
     :level="6"
     @onLoadKakaoMap="onLoadKakaoMap"
     style="width:100%; height:100%"
@@ -99,7 +83,6 @@ defineExpose({
       :key="index"
       :lat="marker.lat"
       :lng="marker.lng"
-      @click="handleMarkerClick(marker.id)"
     />
   </KakaoMap>
 </template>
