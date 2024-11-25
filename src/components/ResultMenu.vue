@@ -1,34 +1,31 @@
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useMapStore } from "@/stores/map";
 
 const mapStore = useMapStore();
 
-const itemsPerPage = 10;
-const currentPage = ref(1);
+const currentPage = computed(() => mapStore.currentPage);
+const totalPages = computed(() => mapStore.totalPage);
 
-const paginatedHomeList = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return mapStore.homeList.slice(start, end);
-});
+const homeList = computed(() => mapStore.homeList);
 
-const totalPages = computed(() =>
-  Math.ceil(mapStore.homeList.length / itemsPerPage)
-);
 
+
+// 페이지 이동 (다음 페이지)
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
-    currentPage.value++;
+    mapStore.setCurrentPage(currentPage.value + 1);  // 현재 페이지 + 1
   }
 };
 
+// 페이지 이동 (이전 페이지)
 const prevPage = () => {
   if (currentPage.value > 1) {
-    currentPage.value--;
+    mapStore.setCurrentPage(currentPage.value - 1);  // 현재 페이지 - 1
   }
 };
 
+// 가격을 포맷하는 함수
 const formatPrice = (price) => {
   return price.toLocaleString("ko-KR");
 };
@@ -36,63 +33,72 @@ const formatPrice = (price) => {
 
 <template>
   <div class="flex flex-col h-full bg-white">
-    <!-- 리스트 -->
-    <div
-      class="flex-grow overflow-y-auto scroll"
-    >
+    <!-- 리스트 및 페이지네이션 -->
+    <div class="flex-grow overflow-y-auto scroll relative" v-if="homeList">
       <div
-        v-for="item in paginatedHomeList"
+        v-for="item in homeList"
         :key="item.id"
         class="p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-        @click="$emit('item-click', item.id)"
+        @click="$emit('item-click', { id: item.id, lat: item.lat, lng: item.lng })"
       >
-        <img
-          :src="item.img"
-          :alt="item.title"
-          class="w-full h-40 object-cover mb-2 rounded"
-        />
-        <h3 class="font-bold text-lg mb-1">{{ item.title }}</h3>
-        <p class="text-sm text-gray-600">
-          {{ item.rentType === "YEARLY_RENT" ? "전세" : "월세" }}
-        </p>
-        <p class="font-semibold text-lg">
-          <span v-if="item.rentType === 'YEARLY_RENT'">
-            {{ formatPrice(item.deposit) }}만원
-          </span>
-          <span v-else>
-            {{ formatPrice(item.deposit) }}/{{
-              formatPrice(item.monthlyRent)
-            }}만원
-          </span>
-        </p>
-        <p class="text-sm text-gray-600">
-          {{ item.roomType }} | {{ item.exclusiveArea }}㎡ | {{ item.floor }}층
-        </p>
-        <p class="text-sm text-gray-600">
-          관리비: {{ formatPrice(item.maintenanceCost) }}만원
-        </p>
+        <div class="flex">
+          <div class="w-[150px] h-[150px]">
+            <img
+              :src="item.img"
+              :alt="item.title"
+              class="w-full h-full object-cover mb-2 rounded"
+            />
+          </div>
+          <div class='flex flex-col ml-3 max-w-[200px]'>
+            <p class="font-semibold text-lg">
+              {{ item.rentType === "YEARLY_RENT" ? "전세" : "월세" }}
+            </p>
+            <p class="font-semibold text-lg">
+              <span v-if="item.rentType === 'YEARLY_RENT'">
+                {{ formatPrice(item.deposit) }}만원
+              </span>
+              <span v-else>
+                {{ formatPrice(item.deposit) }}/{{
+                  formatPrice(item.monthlyRent)
+                }}만원
+              </span>
+            </p>
+            <p class="text-sm text-gray-600">
+              {{ item.roomType }} | {{ item.exclusiveArea }}㎡ | {{ item.floor }}
+            </p>
+            <p class="text-sm text-gray-600">
+              관리비: {{ formatPrice(item.maintenanceCost) }}만원
+            </p>
+            <p class="text-sm text-gray-600 truncate">{{ item.title }}</p>
+          </div>
+        </div>
+      </div>
+      <div v-if="!homeList">
+        근처에 매물이 없습니다.
+        다시 검색해주세요
+      </div>
+      <!-- 페이지네이션 -->
+      <div class="bottom-0 left-0 right-0 p-4 flex justify-between items-center mt-5" v-if="homeList">
+        <button
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="px-4 py-2 bg-[#e46d0c] text-white rounded hover:bg-[#e4830c] disabled:bg-gray-300 disabled"
+        >
+          이전
+        </button>
+        <span class="text-sm font-medium">
+          {{ currentPage }} / {{ totalPages }}
+        </span>
+        <button
+          @click="nextPage"
+          :disabled="currentPage === totalPages"
+          class="px-4 py-2 bg-[#e46d0c] text-white rounded hover:bg-[#e4830c] disabled:bg-gray-300 disabled"
+        >
+          다음
+        </button>
       </div>
     </div>
-    <!-- 페이지네이션 -->
-    <div class="flex justify-between items-center p-4 bg-gray-100">
-      <button
-        @click="prevPage"
-        :disabled="currentPage === 1"
-        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
-      >
-        이전
-      </button>
-      <span class="text-sm font-medium">
-        {{ currentPage }} / {{ totalPages }}
-      </span>
-      <button
-        @click="nextPage"
-        :disabled="currentPage === totalPages"
-        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
-      >
-        다음
-      </button>
-    </div>
+
   </div>
 </template>
 
@@ -108,6 +114,10 @@ const formatPrice = (price) => {
 }
 
 .scroll::-webkit-scrollbar-track {
-    background: none;  /*스크롤바 뒷 배경 색상*/
+    background: none;  /* 스크롤바 뒷 배경 색상 */
+}
+
+.scroll {
+  cursor: pointer;
 }
 </style>

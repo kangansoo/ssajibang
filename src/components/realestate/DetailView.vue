@@ -21,12 +21,12 @@ const formatPrice = (price) => {
 </script>
 
 <template>
-  <div v-if="selectedItem" class="w-full h-full p-4 border-r overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-    <div class="w-[200px]">
+  <div v-if="selectedItem" class="felx flex-col w-full h-full p-4 border-r overflow-y-auto scroll relative align-center">
+    <div class="w-[300px] h-[300px]">
         <img :src="selectedItem.img" :alt="selectedItem.title" class="w-full h-64 object-cover mb-4 rounded">
     </div>
-    <h2 class="text-2xl font-bold mb-2">{{ selectedItem.title }}</h2>
-    <p class="text-lg mb-2">
+    <p class="text-xs">{{ selectedItem.address }}</p>
+    <h2 class="text-2xl font-bold mb-1">
       {{ selectedItem.rentType === 'YEARLY_RENT' ? '전세' : '월세' }}:
       <span v-if="selectedItem.rentType === 'YEARLY_RENT'">
         {{ formatPrice(selectedItem.deposit) }}만원
@@ -34,17 +34,38 @@ const formatPrice = (price) => {
       <span v-else>
         {{ formatPrice(selectedItem.deposit) }}/{{ formatPrice(selectedItem.monthlyRent) }}만원
       </span>
-    </p>
-    <p class="mb-2">{{ selectedItem.roomType }} | {{ selectedItem.exclusiveArea }}㎡ | {{ selectedItem.floor }}층</p>
-    <p class="mb-2">관리비: {{ formatPrice(selectedItem.maintenanceCost) }}만원</p>
-    <p class="mb-2">주소: {{ selectedItem.address }}</p>
-    <p class="mb-2">방 개수: {{ selectedItem.roomCnt }}</p>
-    <p class="mb-2">화장실 개수: {{ selectedItem.bathroomCnt }}</p>
-    <p class="mb-2">방향: {{ selectedItem.direction }}</p>
-    <p class="mb-2">입주 가능일: {{ selectedItem.availableFrom }}</p>
-    <p class="mb-2">건물 유형: {{ selectedItem.homeType }}</p>
+    </h2>
+    <p class="mb-2 text-sm">관리비: {{ formatPrice(selectedItem.maintenanceCost) }}만원</p>
+
+    <hr>
+    <p class="text-sm mt-2 mb-2">{{ selectedItem.title }}</p>
+    <p class="mb-2 text-sm">{{ selectedItem.roomType }} | {{ selectedItem.exclusiveArea }}㎡ | {{ selectedItem.floor }}층</p>
+    <p class="mb-2 text-sm">방 개수: {{ selectedItem.roomCnt }}</p>
+    <p class="mb-2 text-sm">화장실 개수: {{ selectedItem.bathroomCnt }}</p>
+    <p class="mb-2 text-sm">방향: {{ selectedItem.direction }}</p>
+    <p class="mb-2 text-sm">입주 가능일: {{ selectedItem.availableFrom }}</p>
+    <p class="mb-2 text-sm">건물 유형: {{ selectedItem.homeType }}</p>
+    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t">
+      <button class="w-full py-2 bg-[#e46d0c] text-white rounded hover:bg-[#e4830c] transition duration-300">작성자에게 문의하기</button>
+    </div>
   </div>
   <div v-else class="flex items-center justify-center h-full">
     <p class="text-xl text-gray-500">매물을 선택해주세요</p>
   </div>
 </template>
+
+<style scoped>
+.scroll::-webkit-scrollbar {
+    width: 5px;  /* 스크롤바의 너비 */
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    height: 30%; /* 스크롤바의 길이 */
+    background: #d4d4d4; /* 스크롤바의 색상 */
+    border-radius: 10px;
+}
+
+.scroll::-webkit-scrollbar-track {
+    background: none;  /*스크롤바 뒷 배경 색상*/
+}
+</style>

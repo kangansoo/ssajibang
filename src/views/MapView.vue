@@ -1,27 +1,26 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
-import VKakaoMap from "@/components/common/VKakaoMap.vue";
+import { ref, watch } from "vue";
 import ResultMenu from "@/components/ResultMenu.vue";
 import SearchFilter from "@/components/SearchFilter.vue";
 import KakaoMap from "@/components/common/KakaoMap.vue";
 import DetailView from "@/components/realestate/DetailView.vue";
 import "primeicons/primeicons.css";
 
-const selectedId = ref(null);
+const selectedId = ref(null); // 선택된 마커의 id
+const mapRef = ref(null); // KakaoMap 컴포넌트를 참조할 변수
 
-const route = useRoute();
-const searchQuery = ref("");
-const chargingStations = ref([]);
-const selectStation = ref({});
-
-const handleItemClick = (id) => {
+const handleItemClick = ({ id, lat, lng }) => {
   selectedId.value = id;
+  if (mapRef.value) {
+    mapRef.value.moveToMarker({ lat, lng }); // KakaoMap 중심 이동 호출
+  }
 };
 
 const closeDetail = () => {
   selectedId.value = null;
 };
+
+watch(()=>{selectedId, handleItemClick});
 </script>
 
 <template>
@@ -43,6 +42,7 @@ const closeDetail = () => {
       <div
         class="absolute top-0 left-[400px] h-full w-[400px] z-10 bg-white border-r border-solid border-[#f5f2f0] transition-transform duration-300"
         :class="{ 'translate-x-0': selectedId, '-translate-x-full': !selectedId }"
+        v-if="selectedId"
       >
         <DetailView :selectedId="selectedId" class="h-full w-full" />
         <div
@@ -60,7 +60,7 @@ const closeDetail = () => {
 
       <!-- KakaoMap 영역 -->
       <div class="flex-grow flex justify-end h-full">
-        <KakaoMap />
+        <KakaoMap ref="mapRef" />
       </div>
     </div>
   </div>
