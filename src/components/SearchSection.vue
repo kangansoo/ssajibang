@@ -1,31 +1,45 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { useAutocomplete } from '@/components/composables/useAutocomplete.js';
+import { ref } from 'vue';
+import { localAxios } from '@/util/http-commons';
 
 const router = useRouter();
 const backgroundImage = "https://cdn.usegalileo.ai/sdxl10/6f50d5fa-a305-4a75-a19f-ca514dd6cfc0.png";
 
 const { searchQuery, suggestions } = useAutocomplete();
+const bCode = ref(''); // 선택된 동의 bCode를 저장
 
-const submitSearch = () => {
-  if (searchQuery.value.trim()) {
-    router.push({ name: 'Map', query: { search: searchQuery.value } });
-  } else {
-    alert('검색어를 입력해주세요.');
-  }
-};
-
-const handleKeyPress = (event) => {
-  if (event.key === 'Enter') {
-    submitSearch();
-  }
-};
-
-const selectSuggestion = (suggestion) => {
-  searchQuery.value = suggestion; // 선택된 location 값 설정
+// 자동완성 항목 클릭 시 처리 로직
+const selectSuggestion = async (suggestion) => {
+  // 마지막 공백 뒤 문자열 추출
+  const location = suggestion.trim().split(' ').pop();
+  console.log("location:", location);
+  searchQuery.value = suggestion; // UI 업데이트 (선택된 전체 문자열 표시)
   suggestions.value = []; // 자동완성 목록 숨기기
+
+  try {
+    // 동 이름(location)으로 bCode 요청
+    const response = await localAxios().get('/home/search', {
+      params: { location },
+    });
+
+    console.log('response: ', response.data[0])
+
+    if (response.data[0] && response.data[0].bcode) {
+      bCode.value = response.data.bCode; // bCode 업데이트
+      // 이후 로직 처리 (예: 지도로 이동)
+      router.push({ name: 'Map', query: { bCode: bCode.value } });
+    } else {
+      alert('해당 지역의 데이터를 찾을 수 없습니다.');
+    }
+  } catch (error) {
+    console.error('Error fetching bCode:', error);
+    alert('bCode를 가져오는 데 실패했습니다.');
+  }
 };
 
+// 강조된 검색어 표시
 const highlightMatch = (suggestion) => {
   const query = searchQuery.value.trim();
   if (!query) return suggestion; // 검색어가 없으면 강조하지 않음
@@ -44,7 +58,7 @@ const highlightMatch = (suggestion) => {
         :style="{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url('${backgroundImage}')` }">
         <h1
           class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] text-center">
-          Find your dream home
+          Find your SSAFY dream home
         </h1>
         <label class="flex flex-col min-w-40 h-14 w-full max-w-[480px] @[480px]:h-16">
           <div class="flex w-full flex-1 items-stretch rounded-xl h-full relative">
@@ -57,8 +71,8 @@ const highlightMatch = (suggestion) => {
                 </path>
               </svg>
             </div>
-            <input v-model="searchQuery" placeholder="시, 구, 동을 검색해보세요" @keypress="handleKeyPress"
-              class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#181411] focus:outline-0 focus:ring-0 border border-[#e6e0db] bg-white focus:border-[#e6e0db] h-full placeholder:text-[#8a7360] px-[15px] rounded-r-none border-r-0 pr-2 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal" />
+            <input v-model="searchQuery" placeholder="시, 구, 동을 검색해보세요"
+              class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#181411] focus:outline-0 focus:ring-0 border border-[#e6e0db] bg-white focus:border-[#e6e0db] h-full placeholder:text-[#8a7360] px-[15px] border-r-0 pr-2 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal" />
             <!-- 자동 완성 제안 목록 -->
             <ul v-if="suggestions.length > 0"
               class="absolute z-10 mt-[64px] w-full bg-white border border-gray-300 rounded-md shadow-lg">
@@ -67,13 +81,6 @@ const highlightMatch = (suggestion) => {
                 <span v-html="highlightMatch(suggestion)"></span>
               </li>
             </ul>
-            <div
-              class="flex items-center justify-center rounded-r-xl border-l-0 border border-[#e6e0db] bg-white pr-[7px]">
-              <button @click="submitSearch"
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#e46d0c] text-white text-sm font-bold transition duration-300 ease-in-out hover:scale-110">
-                <span class="truncate">검색하기</span>
-              </button>
-            </div>
           </div>
         </label>
       </div>
