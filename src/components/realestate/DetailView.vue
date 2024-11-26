@@ -50,7 +50,7 @@ const handleContactAuthor = () => {
 </script>
 
 <template>
-  <div v-if="selectedItem" class="flex flex-col w-full h-full p-4 border-r overflow-y-auto scroll relative align-center">
+  <div v-if="selectedItem" class="flex flex-col w-full h-[full-80px] p-4 pb-0 border-r overflow-y-auto scroll relative align-center relative">
     <div class="w-[300px] h-[300px]">
       <!-- 이미지 -->
       <img
@@ -81,7 +81,7 @@ const handleContactAuthor = () => {
     <p class="mb-2 text-sm">입주 가능일: {{ selectedItem.availableFrom }}</p>
     <p class="mb-2 text-sm">건물 유형: {{ selectedItem.homeType }}</p>
     <p v-if="currentTab === 'ssafy'" class="text-wrap">{{ selectedItem.content }}</p>
-    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t"
+    <div class="sticky h-[70px] mt-2 bottom-0 left-0 right-0 p-4 bg-white border-t"
         v-if="currentTab === 'ssafy'">
       <button @click="handleContactAuthor" class="w-full py-2 bg-[#e46d0c] text-white rounded hover:bg-[#e4830c] transition duration-300">작성자에게 문의하기</button>
     </div>

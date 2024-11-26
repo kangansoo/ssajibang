@@ -45,10 +45,10 @@ onUnmounted(() => {
     </button>
     <Transition name="dropdown">
       <div v-if="isOpen" class="absolute right-0 mt-2 w-[200px] bg-white border border-gray-200 rounded-md shadow-lg">
-        <div class="py-2 h-[150px] flex flex-col justify-between">
-          <RouterLink to="/chat" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+        <div class="py-2 h-[100px] flex flex-col justify-between">
+          <!-- <RouterLink to="/chat" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
             내 채팅
-          </RouterLink>
+          </RouterLink> -->
           <RouterLink to="/mypage" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
             마이페이지
           </RouterLink>
