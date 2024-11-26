@@ -10,6 +10,8 @@ import Aura from '@primevue/themes/aura';
 import VueDaumPostcode from 'vue-daum-postcode'
 import { useKakao } from 'vue3-kakao-maps/@utils';
 import _ from 'lodash'
+import { Quasar, Notify, Dialog } from 'quasar';
+import { VueSpinnersPlugin } from 'vue3-spinners';
 
 const kakaoKey = import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY;
 
@@ -25,5 +27,11 @@ app.use(PrimeVue, {
   }
 });
 app.use(VueDaumPostcode)
-
+app.use(Quasar, {
+  plugins: {
+    Notify,
+    Dialog,
+  }
+})
+app.use(VueSpinnersPlugin)
 app.mount('#app')

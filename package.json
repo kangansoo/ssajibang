@@ -17,6 +17,7 @@
     "pinia": "^2.2.6",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.2",
+    "quasar": "^2.17.4",
     "quill": "^2.0.2",
     "vue": "^3.5.12",
     "vue-daum-postcode": "^1.2.1",
