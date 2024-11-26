@@ -25,6 +25,7 @@ const handleLogin = async () => {
 
       // JWT 디코딩
       const decodedToken = jwtDecode(accessToken);
+      console.log('decodedToken ', decodedToken);
 
       // 유저 정보를 Pinia store에 저장
       userStore.setUserInfo({
