@@ -5,7 +5,7 @@ import { ref } from 'vue';
 import { localAxios } from '@/util/http-commons';
 
 const router = useRouter();
-const backgroundImage = "https://cdn.usegalileo.ai/sdxl10/6f50d5fa-a305-4a75-a19f-ca514dd6cfc0.png";
+const backgroundImage = "https://s.zigbang.com/v1/web/main/zigbangWeb_heroImg_1440.jpg";
 
 const { searchQuery, suggestions } = useAutocomplete();
 const bCode = ref(''); // 선택된 동의 bCode를 저장
@@ -56,10 +56,12 @@ const highlightMatch = (suggestion) => {
       <div
         class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-start justify-end px-4 pb-10 @[480px]:px-10"
         :style="{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url('${backgroundImage}')` }">
-        <h1
-          class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] text-center">
-          Find your SSAFY dream home
-        </h1>
+        <p
+          class="text-white text-3xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] text-start">
+          싸피 <br/>
+          지역<br/>
+          방구하기
+        </p>
         <label class="flex flex-col min-w-40 h-14 w-full max-w-[480px] @[480px]:h-16">
           <div class="flex w-full flex-1 items-stretch rounded-xl h-full relative">
             <div
