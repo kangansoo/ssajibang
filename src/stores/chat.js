@@ -1,4 +1,3 @@
-// @/stores/chat.js
 import { defineStore } from 'pinia';
 
 export const useChatStore = defineStore('chat', {
@@ -10,17 +9,15 @@ export const useChatStore = defineStore('chat', {
     ],
     currentChat: null,
     messages: [],
+    isOpen: false,  // 채팅창 상태
+    activeTab: 'home',  // 기본 탭은 'home'
   }),
 
   actions: {
     // 채팅방 선택
     selectChat(chat) {
       this.currentChat = chat;
-      // 예시: 채팅방 선택 시 임의로 메시지 초기화 (실제 구현 시 서버에서 불러올 수 있음)
-      this.messages = [
-        { id: 1, sender: chat.name, content: '안녕하세요!', time: '10:35' },
-        { id: 2, sender: '나', content: '네, 안녕하세요!', time: '10:36' },
-      ];
+      this.messages = []; // 채팅 내용 초기화
     },
 
     // 메시지 전송
@@ -41,6 +38,11 @@ export const useChatStore = defineStore('chat', {
         return chat;
       });
       this.chatList = updatedChatList;
+    },
+
+    // 채팅 창 열기 / 닫기
+    toggleChat(status) {
+      this.isOpen = status;
     },
   },
 });

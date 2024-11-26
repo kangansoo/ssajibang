@@ -1,18 +1,20 @@
 <script setup>
 import { ref } from 'vue';
+import { useChatStore } from '@/stores/chat';
 import 'primeicons/primeicons.css'
 import ChatWindow from './ChatWindow.vue';
 
-const isOpen = ref(false);
+const chatStore = useChatStore();
 const isClicked = ref(false);
 
 const open = () => {
-  isOpen.value = !isOpen.value;
+  // 채팅창 열기 / 닫기 상태를 toggleChat 액션을 통해 관리
+  chatStore.toggleChat(!chatStore.isOpen);
   isClicked.value = true;
   setTimeout(() => {
     isClicked.value = false;
   }, 300); // 애니메이션 지속 시간과 일치
-}
+};
 </script>
 
 <template>
@@ -20,15 +22,15 @@ const open = () => {
     <div @click="open"
          :class="[
            'w-16 h-16 border rounded-full flex items-center justify-center cursor-pointer bg-[#e46d0c] transition-all duration-300 ease-in-out',
-           {'hover:scale-110': !isClicked, 'scale-90': isClicked}
+           { 'hover:scale-110': !isClicked, 'scale-90': isClicked }
          ]">
       <Transition name="zoom-fade" mode="out-in">
-        <i v-if="!isOpen" key="comments" class="pi pi-comments" style="font-size:30px; color:white"></i>
+        <i v-if="!chatStore.isOpen" key="comments" class="pi pi-comments" style="font-size:30px; color:white"></i>
         <i v-else key="times" class="pi pi-times" style="font-size:30px; color:white"></i>
       </Transition>
     </div>
     <Transition name="dropdown">
-      <ChatWindow v-if="isOpen"/>
+      <ChatWindow v-if="chatStore.isOpen"/>
     </Transition>
   </div>
 </template>

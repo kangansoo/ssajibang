@@ -42,8 +42,11 @@ const handleContactAuthor = () => {
       chatStore.chatList.push(newChat);
       chatStore.selectChat(newChat); // 새 채팅방 선택
     }
+    // 채팅 창 열기
+    chatStore.toggleChat(true); // ChatWindow 열기 상태 전달
   }
 };
+
 </script>
 
 <template>
