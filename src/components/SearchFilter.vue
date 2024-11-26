@@ -1,41 +1,99 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useMapStore } from '@/stores/map.js';
+import axios from 'axios';
 
-const searchQuery = ref('');  // 지역 또는 지하철역 검색
-const priceRange = ref('');   // 가격대
-const rentType = ref('');     // 임대 유형 (월세/전세)
-const areaRange = ref('');    // 면적 범위
-const selectedTab = ref('');  // 탭 선택 (일반 매물 / 싸피 매물)
-const roomType = ref('');  // 방 종류
+// 필터링 관련 상태 변수
+const searchQuery = ref('');
+const rentType = ref('');
+const priceRange = ref('');
+const depositRange = ref('');
+const maintenanceCostRange = ref('');
+const areaRange = ref('');
+const roomType = ref('');
 
+// Vuex 상태 관리
 const mapStore = useMapStore();
-const currentTab = computed(()=>mapStore.tab);
+const currentTab = computed(() => mapStore.tab);
 
-// 필터링 탭 변경
+// 탭 변경 함수
 const selectTab = (tab) => {
-  selectedTab.value = tab;
-  mapStore.setTab(tab);  // mapStore에 탭 정보 업데이트
+  mapStore.setTab(tab);
 };
 
-// 필터 옵션 목록
+// 필터 값 파싱
+const parseFilterValue = (value) => {
+  if (!value) return { min: null, max: null };
+
+  const [min, max] = value.split('-').map((v) => {
+    const num = parseFloat(v.replace(/[^0-9]/g, ''));
+    return isNaN(num) ? null : num;
+  });
+
+  return { min, max };
+};
+
+// 데이터 요청 및 상태 업데이트
+const handleSearch = async () => {
+  const price = parseFilterValue(priceRange.value);
+  const deposit = parseFilterValue(depositRange.value);
+  const maintenanceCost = parseFilterValue(maintenanceCostRange.value);
+  const area = parseFilterValue(areaRange.value);
+
+  const params = {
+    query: searchQuery.value || '',
+    rentType: rentType.value || '',
+    roomType: roomType.value || '',
+    monthlyRentRangeMin: price.min,
+    monthlyRentRangeMax: price.max,
+    depositRangeMin: deposit.min,
+    depositRangeMax: deposit.max,
+    maintenanceCostRangeMin: maintenanceCost.min,
+    maintenanceCostRangeMax: maintenanceCost.max,
+    exclusiveAreaRangeMin: area.min,
+    exclusiveAreaRangeMax: area.max,
+    page: mapStore.currentPage,
+  };
+
+  const endpoint = currentTab.value === 'normal' ? '/home/dabang' : '/home/ssafy';
+
+  try {
+    const response = await axios.get(endpoint, { params });
+    const { totalPage, totalCnt, homeList } = response.data;
+
+    mapStore.updateMapData({ totalPage, totalCnt, homeList });
+  } catch (error) {
+    console.error('Failed to fetch data:', error);
+  }
+};
+
+// 필터 상태 변경 감지
+watch(
+  [searchQuery, rentType, priceRange, depositRange, maintenanceCostRange, areaRange, roomType],
+  () => {
+    handleSearch();
+  },
+  { immediate: true }
+);
+
+// 필터 옵션
 const rentTypes = ['월세', '전세'];
-const priceRanges = ['0-30만원', '30-50만원', '50-70만원', '70-100만원', '100만원 이상'];
-const deposits = ['5만원', '5-10만원', '10만원이상']
-const areaRanges = ['0-20m²', '20-30m²', '30-40m²', '40-50m²', '50m² 이상'];
+const priceRanges = ['0-30', '30-50', '50-70', '70-100', '100-'];
+const deposits = ['0-100', '100-200', '200-300', '300-500', '500-1000', '1000-'];
+const maintenanceCosts = ['0-5', '5-10', '10-'];
+const areaRanges = ['0-20', '20-30', '30-40', '40-50', '50-'];
 const roomTypes = ['원룸', '투룸', '투룸 이상'];
-
-
 </script>
 
 <template>
   <div class="flex items-center px-4 h-full gap-5">
+
     <!-- 탭 버튼 -->
     <div
       class="w-[100px] cursor-pointer py-2 text-center rounded-lg hover:bg-[#e46d0c] hover:text-white"
       :class="{
         'bg-[#e46d0c] text-white': currentTab === 'normal',
-        'bg-white text-black': currentTab !== 'normal'
+        'bg-white text-black': currentTab !== 'normal',
       }"
       @click="selectTab('normal')"
     >
@@ -45,98 +103,44 @@ const roomTypes = ['원룸', '투룸', '투룸 이상'];
       class="w-[100px] cursor-pointer py-2 text-center rounded-lg hover:bg-[#e46d0c] hover:text-white"
       :class="{
         'bg-[#e46d0c] text-white': currentTab === 'ssafy',
-        'bg-white text-black': currentTab !== 'ssafy'
+        'bg-white text-black': currentTab !== 'ssafy',
       }"
       @click="selectTab('ssafy')"
     >
       싸피 매물
     </div>
 
-    <!-- 지역 검색 -->
-    <div class="relative">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="지역, 지하철역으로 검색"
-        class="w-[300px] px-2 py-1 pr-10 border rounded"
-      />
-      <img
-        src="@/assets/search-icon.png"
-        alt="검색"
-        class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer"
-        @click="handleSearch"
-      />
-    </div>
+    <!-- 검색 및 필터 -->
+    <input v-model="searchQuery" type="text" placeholder="지역, 지하철역으로 검색" class="w-[300px] px-2 py-1 border rounded" />
 
-    <!-- 월세/전세 선택 -->
-    <select
-      v-model="rentType"
-      class="px-2 py-1 border rounded"
-    >
-      <option value="" disabled selected>임대 유형</option>
-      <option v-for="type in rentTypes" :key="type" :value="type">
-        {{ type }}
-      </option>
+    <select v-model="rentType">
+      <option value="">임대 유형</option>
+      <option v-for="type in rentTypes" :key="type" :value="type">{{ type }}</option>
     </select>
 
-    <!-- 가격대 선택 -->
-    <select
-      v-model="priceRange"
-      class="px-2 py-1 border rounded"
-    >
-      <option value="" disabled selected>가격대</option>
-      <option v-for="range in priceRanges" :key="range" :value="range">
-        {{ range }}
-      </option>
+    <select v-model="priceRange">
+      <option value="">가격대</option>
+      <option v-for="range in priceRanges" :key="range" :value="range">{{ range }}만원</option>
     </select>
 
-    <!-- 면적 범위 선택 -->
-    <select
-      v-model="areaRange"
-      class="px-2 py-1 border rounded"
-    >
-      <option value="" disabled selected>면적</option>
-      <option v-for="range in areaRanges" :key="range" :value="range">
-        {{ range }}
-      </option>
+    <select v-model="depositRange">
+      <option value="">보증금</option>
+      <option v-for="range in deposits" :key="range" :value="range">{{ range }}만원</option>
     </select>
 
-    <!-- 보증금 범위 선택 -->
-    <select
-      v-model="areaRange"
-      class="px-2 py-1 border rounded"
-    >
-      <option value="" disabled selected>보증금</option>
-      <option v-for="range in deposits" :key="range" :value="range">
-        {{ range }}
-      </option>
+    <select v-model="maintenanceCostRange">
+      <option value="">관리비</option>
+      <option v-for="range in maintenanceCosts" :key="range" :value="range">{{ range }}만원</option>
     </select>
 
-    <!-- 방 종류 선택 -->
-    <select
-      v-model="roomType"
-      class="px-2 py-1 border rounded"
-    >
-      <option value="" disabled selected>방 종류</option>
-      <option v-for="type in roomTypes" :key="type" :value="type">
-        {{ type }}
-      </option>
+    <select v-model="areaRange">
+      <option value="">면적</option>
+      <option v-for="range in areaRanges" :key="range" :value="range">{{ range }}</option>
     </select>
 
-    <!-- 검색 버튼 -->
-    <button @click="handleSearch" class="bg-[#e46d0c] text-white py-1 px-4 rounded">
-      검색
-    </button>
+    <select v-model="roomType">
+      <option value="">방 종류</option>
+      <option v-for="type in roomTypes" :key="type" :value="type">{{ type }}</option>
+    </select>
   </div>
 </template>
-
-<style scoped>
-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 1.5em 1.5em;
-  padding-right: 2.5rem;
-}
-</style>

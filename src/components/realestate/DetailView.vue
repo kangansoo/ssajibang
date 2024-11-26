@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useMapStore } from '@/stores/map';
+import { useChatStore } from '@/stores/chat';
 
 const props = defineProps({
   selectedId: {
@@ -10,6 +11,8 @@ const props = defineProps({
 });
 
 const mapStore = useMapStore();
+const chatStore = useChatStore();
+
 const currentTab = computed(() => mapStore.tab); // 현재 탭 확인
 
 const selectedItem = computed(() => {
@@ -18,6 +21,28 @@ const selectedItem = computed(() => {
 
 const formatPrice = (price) => {
   return price.toLocaleString('ko-KR');
+};
+
+const handleContactAuthor = () => {
+  if (selectedItem.value) {
+    const { name } = selectedItem.value.member; // 작성자 이름
+    const existingChat = chatStore.chatList.find(chat => chat.name === name);
+
+    // 이미 채팅방이 있으면 해당 채팅방을 열기
+    if (existingChat) {
+      chatStore.selectChat(existingChat);
+    } else {
+      // 새로운 채팅방 추가
+      const newChat = {
+        id: Date.now(), // 고유한 ID 생성
+        name,
+        lastMessage: '',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      chatStore.chatList.push(newChat);
+      chatStore.selectChat(newChat); // 새 채팅방 선택
+    }
+  }
 };
 </script>
 
@@ -42,7 +67,7 @@ const formatPrice = (price) => {
       </span>
     </h2>
     <p class="mb-2 text-sm">관리비: {{ formatPrice(selectedItem.maintenanceCost) }}만원</p>
-    <!-- <p v-if="currentTab === 'ssafy'" class="text-sm text-gray-600 mb-2">작성자: {{ selectedItem.member.name }}</p> -->
+    <p v-if="currentTab === 'ssafy'" class="text-sm text-gray-600 mb-2">작성자: {{ selectedItem.member.name }}</p>
 
     <hr>
     <p class="text-sm mt-2 mb-2">{{ selectedItem.title }}</p>
@@ -55,7 +80,7 @@ const formatPrice = (price) => {
     <p v-if="currentTab === 'ssafy'" class="text-wrap">{{ selectedItem.content }}</p>
     <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t"
         v-if="currentTab === 'ssafy'">
-      <button class="w-full py-2 bg-[#e46d0c] text-white rounded hover:bg-[#e4830c] transition duration-300">작성자에게 문의하기</button>
+      <button @click="handleContactAuthor" class="w-full py-2 bg-[#e46d0c] text-white rounded hover:bg-[#e4830c] transition duration-300">작성자에게 문의하기</button>
     </div>
   </div>
   <div v-else class="flex items-center justify-center h-full">

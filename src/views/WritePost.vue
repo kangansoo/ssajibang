@@ -1,13 +1,8 @@
 <script setup>
-// import Editor from 'primevue/editor';
-import { VueDaumPostcode } from "vue-daum-postcode";
 import { ref } from 'vue';
 import { localAxios } from '@/util/http-commons';
-import { VueSpinner } from 'vue3-spinners';
-import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
 
-const $q = useQuasar();
 const router = useRouter();
 const isLoading = ref(false);
 
@@ -55,8 +50,8 @@ const oncomplete = (result) => {
 };
 
 const generateContent = async () => {
-  isLoading.value=true;
-  try{
+  isLoading.value = true;
+  try {
     const homeReq = {
       address: jibun.value,
       rentType: rentType.value === '전세' ? 'YEARLY_RENT' : 'MONTHLY_RENT',
@@ -74,24 +69,21 @@ const generateContent = async () => {
       expirationDate: expirationDate.value,
       availableFrom: availableFrom.value,
       homeType: houseType.value,
-      constructionYear: Number(constructionYear.value)
+      constructionYear: Number(constructionYear.value),
     };
 
     const response = await localAxios().post('/home/ssafy/content-ai-generation', homeReq);
-    aiContent.value = response.data; // AI 응답 데이터 처리
-    content.value = aiContent.value; // textarea에 값 할당
-    $q.notify({ type: 'positive', message: 'AI로 작성된 내용을 추가했습니다.' });
+    aiContent.value = response.data;
+    content.value = aiContent.value;
   } catch (error) {
     console.error('AI 작성 오류:', error);
-    $q.notify({ type: 'negative', message: 'AI로 설명 작성 중 오류가 발생했습니다.' });
   } finally {
     isLoading.value = false;
-    // spinner.hide();
   }
-}
+};
 
 const submitPost = async () => {
-  if(!isLoading.value){
+  if (!isLoading.value) {
     try {
       const homeReq = {
         address: jibun.value,
@@ -110,36 +102,33 @@ const submitPost = async () => {
         expirationDate: expirationDate.value,
         availableFrom: availableFrom.value,
         homeType: houseType.value,
-        constructionYear: Number(constructionYear.value)
+        constructionYear: Number(constructionYear.value),
       };
 
       const formData = new FormData();
-      formData.append('homeReq', JSON.stringify(homeReq));
+      const jsonBlob = new Blob([JSON.stringify(homeReq)], { type: 'application/json' });
+      formData.append('homeReq', jsonBlob);
 
+      if(!images.value){
+        formData.append(null);
+      }
       images.value.forEach((image, index) => {
         formData.append('images', dataURLtoFile(image, `image${index}.jpg`));
       });
 
       const response = await localAxios().post('/home/ssafy', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-
-      console.log("Response: ", response.data);
-      $q.dialog({
-        title: '매물 작성 완료',
-        message: '매물이 성공적으로 등록되었습니다!',
-        ok: '확인',
-      }).onOk(() => {
-        router.push('/');
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
+      if (response.status === 200) {
+        alert('매물 등록이 완료되었습니다');
+        router.push('/');
+      }
     } catch (error) {
       console.error('게시물 제출 중 오류 발생:', error);
-      $q.notify({
-        type: 'negative',
-        message: '매물 등록 중 오류가 발생했습니다.'
-      });
+      alert('매물 등록 중 오류가 발생했습니다.');
     }
   }
 };
@@ -156,17 +145,16 @@ const onFileChange = (e) => {
   }
 };
 
-// Data URL을 File 객체로 변환하는 함수
 const dataURLtoFile = (dataurl, filename) => {
-  let arr = dataurl.split(','),
-      mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]),
-      n = bstr.length,
-      u8arr = new Uint8Array(n);
-  while(n--){
+  let arr = dataurl.split(',');
+  let mime = arr[0].match(/:(.*?);/)[1];
+  let bstr = atob(arr[1]);
+  let n = bstr.length;
+  let u8arr = new Uint8Array(n);
+  while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
-  return new File([u8arr], filename, {type:mime});
+  return new File([u8arr], filename, { type: mime });
 };
 </script>
 

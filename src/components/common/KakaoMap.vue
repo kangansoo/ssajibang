@@ -49,6 +49,7 @@ const fetchMarkers = async () => {
 };
 
 watch(() => [currentPage.value, currentTab.value], fetchMarkers); // 탭 변경 시 데이터 새로 가져오기
+watch(() => {mapStore.homeList}, fetchMarkers);
 
 const onLoadKakaoMap = (mapRef) => {
   map.value = mapRef;
