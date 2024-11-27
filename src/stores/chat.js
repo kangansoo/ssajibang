@@ -10,7 +10,7 @@ export const useChatStore = defineStore('chat', {
     currentChat: null,
     messages: [],
     isOpen: false,  // 채팅창 상태
-    activeTab: 'home',  // 기본 탭은 'home'
+    activeTab: 'chat',  // 기본 탭은 'home'
   }),
 
   actions: {
